@@ -7,7 +7,6 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Patrón de fondo estilo retro / 8 bits inspirado en mapaches */
         body {
             background-color: #212529;
             background-image: 
@@ -24,16 +23,13 @@
 <body class="min-h-screen text-gray-100">
 
     <div class="max-w-6xl mx-auto p-4">
-        <!-- Encabezado -->
+        <!-- Encabezado Cliente (Sin Botón Admin) -->
         <header class="bg-gray-800 border border-gray-700 shadow-xl rounded-xl p-4 mb-6 flex justify-between items-center">
             <h1 class="text-2xl font-extrabold text-emerald-400 tracking-wide">🦝 Primo Tachi - Catálogo Online</h1>
-            <div class="flex gap-2">
-                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold transition shadow">Catálogo</button>
-                <button onclick="solicitarAccesoAdmin()" id="btn-admin" class="bg-gray-700 text-gray-200 px-4 py-2 rounded-lg font-semibold transition hover:bg-gray-600 shadow">Administrar</button>
-            </div>
+            <span class="text-xs text-emerald-400 bg-emerald-950 px-3 py-1.5 rounded-lg border border-emerald-800 font-bold">● Tienda Oficial</span>
         </header>
 
-        <!-- Anuncio y Horarios Dinámicos desde la Nube -->
+        <!-- Anuncio y Horarios Dinámicos -->
         <div id="banner-anuncio" class="bg-gray-800 border-l-4 border-emerald-500 p-4 rounded-xl shadow-lg mb-6 hidden">
             <h3 class="font-bold text-emerald-400 text-sm">📢 Anuncio Importante:</h3>
             <p id="texto-anuncio" class="text-xs text-gray-300 mt-1"></p>
@@ -43,12 +39,10 @@
             <span id="estado-tienda" class="font-bold px-2 py-1 rounded border">Verificando...</span>
         </div>
 
-        <!-- Mensaje de Estado / Alertas -->
         <div id="status-message" class="hidden mb-4 p-3 rounded-xl text-sm font-semibold shadow"></div>
 
         <!-- Vista: Catálogo y Carrito -->
-        <div id="view-catalogo" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Lista de Productos -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="md:col-span-2">
                 <h2 class="text-xl font-semibold mb-4 text-emerald-400 border-b border-gray-700 pb-2">Productos Disponibles</h2>
                 <div id="productos-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -56,7 +50,7 @@
                 </div>
             </div>
 
-            <!-- Carrito de Compras y Datos de Envío -->
+            <!-- Carrito de Compras -->
             <div class="bg-gray-800 border border-gray-700 p-5 rounded-xl shadow-xl h-fit space-y-4">
                 <h2 class="text-xl font-semibold text-emerald-400 border-b border-gray-700 pb-2">Tu Carrito</h2>
                 <div id="carrito-items" class="divide-y divide-gray-700 max-h-48 overflow-y-auto pr-1">
@@ -67,7 +61,6 @@
                     <span id="carrito-total" class="text-emerald-400">$0.00</span>
                 </div>
 
-                <!-- Formulario de Datos del Comprador -->
                 <div class="border-t border-gray-700 pt-3 space-y-3">
                     <h3 class="font-bold text-sm text-emerald-300">Datos para la Entrega</h3>
                     <div>
@@ -80,9 +73,6 @@
                             <a href="https://maps.google.com" target="_blank" class="text-xs text-emerald-400 font-semibold hover:underline">🗺️ Abrir Google Maps</a>
                         </div>
                         <input type="text" id="cliente-ubicacion" placeholder="Pega aquí el enlace de Google Maps" class="w-full p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
-                        <p class="text-[11px] text-gray-400 mt-1 leading-tight">
-                            📌 <em>Instrucciones: Da clic en "Abrir Google Maps", busca tu ubicación, copia el enlace y pégalo aquí.</em>
-                        </p>
                     </div>
                     
                     <div class="grid grid-cols-1 gap-2">
@@ -104,20 +94,17 @@
                                 <option value="especificar">Otra hora específica...</option>
                             </select>
                         </div>
-                        <!-- Campo oculto por si eligen hora específica -->
                         <div id="contenedor-otra-hora" class="hidden">
                             <input type="text" id="cliente-otra-hora-input" placeholder="Escribe la hora exacta (Ej. 5:30 PM)" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
                         </div>
                     </div>
 
-                    <!-- Contenedor dinámico si eligen Transferencia -->
                     <div id="seccion-transferencia" class="hidden bg-gray-900 p-3 rounded-lg border border-emerald-700 space-y-2">
                         <p class="text-sm font-bold text-emerald-400">💳 DATOS PARA TRANSFERENCIA:</p>
                         <p class="text-xs text-gray-300">CLABE: <span class="font-mono font-bold text-sm text-emerald-300">722969015347445761</span></p>
                         <p class="text-xs font-bold text-amber-400 mt-1">⚠️ IMPORTANTE: AL FINALIZAR EL PEDIDO SE ABRIRÁ WHATSAPP Y DEBERÁS MANDAR FOTO DE TU COMPROBANTE DE PAGO.</p>
                     </div>
 
-                    <!-- Casilla de De Acuerdo -->
                     <div class="flex items-center gap-2 pt-2 border-t border-gray-700">
                         <input type="checkbox" id="check-acuerdo" class="w-4 h-4 text-emerald-600 rounded border-gray-700 bg-gray-900 focus:ring-emerald-500">
                         <label for="check-acuerdo" class="text-xs text-gray-300 font-medium">Estoy de acuerdo con los datos de mi pedido y el método de pago seleccionado.</label>
@@ -129,92 +116,9 @@
                 </button>
             </div>
         </div>
-
-        <!-- Vista: Panel de Administración (Protegido) -->
-        <div id="view-admin" class="hidden bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-2xl max-w-xl mx-auto space-y-6">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-3">
-                <h2 class="text-xl font-semibold text-emerald-400">Panel de Administración</h2>
-                <button onclick="cerrarAdmin()" class="text-sm bg-red-900 text-red-200 px-3 py-1 rounded-lg font-semibold hover:bg-red-800 transition">Salir de Admin</button>
-            </div>
-
-            <!-- Configuración de Anuncios y Horarios -->
-            <div class="bg-gray-900 p-4 rounded-xl border border-gray-700 space-y-3">
-                <h3 class="font-bold text-sm text-emerald-400">⚙️ Control de Horarios y Anuncios</h3>
-                <div>
-                    <label class="block text-xs font-medium text-gray-300">Aviso / Anuncio Importante</label>
-                    <textarea id="admin-anuncio" rows="2" placeholder="Ej. ¡Hoy tenemos servicio a domicilio gratis!" class="w-full mt-1 p-2 text-xs bg-gray-800 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500"></textarea>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-300">Hora de Apertura</label>
-                        <select id="admin-hora-apertura" class="w-full mt-1 p-2 text-xs bg-gray-800 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
-                            <option value="6">06:00 AM</option>
-                            <option value="7">07:00 AM</option>
-                            <option value="8">08:00 AM</option>
-                            <option value="9" selected>09:00 AM</option>
-                            <option value="10">10:00 AM</option>
-                            <option value="11">11:00 AM</option>
-                            <option value="12">12:00 PM</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-300">Hora de Cierre</label>
-                        <select id="admin-hora-cierre" class="w-full mt-1 p-2 text-xs bg-gray-800 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
-                            <option value="18">06:00 PM</option>
-                            <option value="19">07:00 PM</option>
-                            <option value="20">08:00 PM</option>
-                            <option value="21" selected>09:00 PM</option>
-                            <option value="22">10:00 PM</option>
-                            <option value="23">11:00 PM</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 pt-1">
-                    <input type="checkbox" id="admin-cerrado-forzado" class="w-4 h-4 text-red-600 rounded border-gray-700 bg-gray-800">
-                    <label for="admin-cerrado-forzado" class="text-xs text-red-400 font-bold">Cerrar tienda manualmente (Modo Vacaciones / Fuera de servicio)</label>
-                </div>
-                <button onclick="guardarConfiguracion(event)" class="w-full bg-amber-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-amber-500 transition">
-                    Guardar Horario y Estado
-                </button>
-            </div>
-            
-            <!-- Formulario de Nuevo Producto -->
-            <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-3 border-t border-gray-700 pt-4">
-                <h3 class="font-bold text-sm text-emerald-400">📦 Agregar Nuevo Producto</h3>
-                <div>
-                    <label class="block text-xs font-medium text-gray-300">Nombre del Producto</label>
-                    <input type="text" id="prod-nombre" required class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-300">Precio ($)</label>
-                    <input type="number" step="0.01" id="prod-precio" required class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-300">Cantidad en Stock</label>
-                    <input type="number" id="prod-stock" required class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-300">Descripción Breve</label>
-                    <textarea id="prod-descripcion" rows="2" placeholder="Ej. Producto 100% fresco y garantizado" class="w-full mt-1 p-2 text-xs bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-300">Imágenes del Producto (Selecciona 1 o varias fotos)</label>
-                    <input type="file" id="prod-imagenes-input" accept="image/*" multiple required class="w-full mt-1 text-xs text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer">
-                    <p class="text-[10px] text-gray-400 mt-1">💡 Mantén presionada la tecla Ctrl para seleccionar varias imágenes al mismo tiempo.</p>
-                </div>
-                <button type="submit" class="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-bold hover:bg-emerald-500 transition shadow">
-                    Guardar Producto en el Catálogo
-                </button>
-            </form>
-
-            <div class="border-t border-gray-700 pt-4">
-                <h3 class="font-bold text-sm text-emerald-400 mb-2">Inventario en la Nube</h3>
-                <div id="admin-productos-lista" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
-            </div>
-        </div>
     </div>
 
-    <!-- Modal con Carrusel para Ver Producto en Grande -->
+    <!-- Modal Carrusel para Ver Producto -->
     <div id="modal-producto" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-gray-900 border border-gray-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative">
             <button onclick="cerrarModal()" class="absolute top-2 right-2 bg-gray-800 text-gray-300 hover:bg-gray-700 w-8 h-8 rounded-full font-bold flex items-center justify-center shadow z-20">✕</button>
@@ -238,60 +142,24 @@
         </div>
     </div>
 
-    <!-- Modal para Administrar / Eliminar Imágenes Específicas de un Producto -->
-    <div id="modal-admin-fotos" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-gray-900 border border-gray-700 rounded-xl max-w-lg w-full p-5 space-y-4 shadow-2xl relative">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-3">
-                <h3 class="font-bold text-lg text-emerald-400">🖼️ Gestionar Fotos del Producto</h3>
-                <button onclick="cerrarAdminFotos()" class="text-gray-400 hover:text-white font-bold text-lg">✕</button>
-            </div>
-            <p class="text-xs text-gray-300">Aquí puedes ver todas las imágenes actuales del producto. Elimina las que no desees o agrega nuevas fotos.</p>
-            
-            <div id="admin-galeria-miniaturas" class="grid grid-cols-3 gap-3 max-h-56 overflow-y-auto p-1 bg-gray-950 rounded-lg border border-gray-800">
-                <!-- Se cargan dinámicamente -->
-            </div>
-
-            <div class="pt-2 border-t border-gray-800">
-                <label class="block text-xs font-medium text-gray-300 mb-1">Añadir más fotos a este producto:</label>
-                <div class="flex gap-2">
-                    <input type="file" id="input-add-mas-fotos" accept="image/*" multiple class="w-full text-xs text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
-                    <button onclick="subirMasFotosAProducto()" class="bg-blue-600 text-white font-bold px-4 py-1.5 rounded-lg text-xs hover:bg-blue-500 transition shadow whitespace-nowrap">Subir Fotos</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script Principal con Firebase v10 en Tiempo Real -->
+    <!-- Script Cliente -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, update, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, update, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = {
-            databaseURL: "https://primo-tache-default-rtdb.firebaseio.com/" 
-        };
-
+        const firebaseConfig = { databaseURL: "https://primo-tache-default-rtdb.firebaseio.com/" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const PASSWORD_ADMIN = "T4ch1PCChaparrito/*#";
         let productos = {};
         let carrito = {};
         let tiendaAbierta = true;
-
         let imagenesActualesModal = [];
         let indiceFotoActual = 0;
-        let idProductoEditandoFotos = null;
 
         onValue(ref(db, 'productos'), (snapshot) => {
             productos = snapshot.val() || {};
             renderCatalogo();
-            const viewAdmin = document.getElementById('view-admin');
-            if (viewAdmin && !viewAdmin.classList.contains('hidden')) {
-                renderAdminLista();
-            }
-            if (idProductoEditandoFotos && productos[idProductoEditandoFotos]) {
-                abrirAdminFotos(idProductoEditandoFotos, true);
-            }
         });
 
         onValue(ref(db, 'config'), (snapshot) => {
@@ -331,13 +199,6 @@
                 btnFinalizar.className = "w-full bg-gray-700 text-gray-400 py-2.5 rounded-lg font-bold cursor-not-allowed";
                 btnFinalizar.innerText = "Tienda Cerrada (Fuera de Horario)";
             }
-
-            if (document.getElementById('admin-anuncio')) {
-                document.getElementById('admin-anuncio').value = config.anuncio || "";
-                document.getElementById('admin-hora-apertura').value = apertura;
-                document.getElementById('admin-hora-cierre').value = cierre;
-                document.getElementById('admin-cerrado-forzado').checked = cerradoForzado;
-            }
         });
 
         function verificarEstadoTienda(apertura, cierre, cerradoForzado) {
@@ -357,22 +218,6 @@
             }
         }
 
-        window.guardarConfiguracion = async function(e) {
-            e.preventDefault();
-            const anuncio = document.getElementById('admin-anuncio').value;
-            const apertura = parseInt(document.getElementById('admin-hora-apertura').value);
-            const cierre = parseInt(document.getElementById('admin-hora-cierre').value);
-            const cerradoForzado = document.getElementById('admin-cerrado-forzado').checked;
-
-            try {
-                await set(ref(db, 'config'), { anuncio, apertura, cierre, cerradoForzado });
-                mostrarAlerta("¡Horario y configuración actualizados con éxito!", "success");
-            } catch (err) {
-                console.error(err);
-                alert("Error al guardar la configuración.");
-            }
-        }
-
         window.verificarMetodoPago = function() {
             const metodo = document.getElementById('cliente-pago').value;
             const seccionTrans = document.getElementById('seccion-transferencia');
@@ -383,207 +228,11 @@
             }
         }
 
-        window.solicitarAccesoAdmin = function() {
-            const pass = prompt("Ingresa la contraseña de administrador:");
-            if (pass === PASSWORD_ADMIN) {
-                cambiarVista('admin');
-                renderAdminLista();
-                mostrarAlerta("Acceso concedido al panel de administración.", "success");
-            } else if (pass !== null) {
-                alert("Contraseña incorrecta.");
-            }
-        }
-
-        window.cerrarAdmin = function() {
-            cambiarVista('catalogo');
-        }
-
-        window.cambiarVista = function(vista) {
-            const vCat = document.getElementById('view-catalogo');
-            const vAdm = document.getElementById('view-admin');
-            const bCat = document.getElementById('btn-catalogo');
-            const bAdm = document.getElementById('btn-admin');
-
-            if (vista === 'catalogo') {
-                vCat.classList.remove('hidden');
-                vAdm.classList.add('hidden');
-                bCat.className = "bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold transition shadow";
-                bAdm.className = "bg-gray-700 text-gray-200 px-4 py-2 rounded-lg font-semibold transition hover:bg-gray-600 shadow";
-            } else {
-                vCat.classList.add('hidden');
-                vAdm.classList.remove('hidden');
-                bAdm.className = "bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold transition shadow";
-                bCat.className = "bg-gray-700 text-gray-200 px-4 py-2 rounded-lg font-semibold transition hover:bg-gray-600 shadow";
-                renderAdminLista();
-            }
-        }
-
-        function convertirArchivoABase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        window.guardarProducto = async function(e) {
-            e.preventDefault();
-            const nombre = document.getElementById('prod-nombre').value;
-            const precio = parseFloat(document.getElementById('prod-precio').value);
-            const stock = parseInt(document.getElementById('prod-stock').value);
-            const descripcion = document.getElementById('prod-descripcion').value.trim() || "Sin descripción disponible.";
-            const inputArchivos = document.getElementById('prod-imagenes-input');
-
-            if (!inputArchivos.files || inputArchivos.files.length === 0) {
-                alert("Por favor selecciona al menos una imagen.");
-                return;
-            }
-
-            try {
-                mostrarAlerta("Procesando imágenes...", "success");
-                let listaImágenes = [];
-                for (let i = 0; i < inputArchivos.files.length; i++) {
-                    const base64Img = await convertirArchivoABase64(inputArchivos.files[i]);
-                    listaImágenes.push(base64Img);
-                }
-
-                const nuevoRef = push(ref(db, 'productos'));
-                await set(nuevoRef, { 
-                    nombre, 
-                    precio, 
-                    stock, 
-                    descripcion, 
-                    imagen: listaImágenes[0], 
-                    imagenes: listaImágenes 
-                });
-
-                document.getElementById('form-producto').reset();
-                mostrarAlerta("¡Producto guardado con éxito en la nube!", "success");
-            } catch (err) {
-                console.error(err);
-                alert("Error al procesar las imágenes.");
-            }
-        }
-
-        window.cambiarStock = async function(id, cantidadCambio) {
-            const prod = productos[id];
-            if (!prod) return;
-            const nuevoStock = prod.stock + cantidadCambio;
-            if (nuevoStock < 0) {
-                alert("El stock no puede ser menor a 0.");
-                return;
-            }
-            try {
-                await update(ref(db, `productos/${id}`), { stock: nuevoStock });
-            } catch (err) {
-                console.error(err);
-                alert("Error al actualizar el stock.");
-            }
-        }
-
-        window.abrirAdminFotos = function(id, silencioso = false) {
-            idProductoEditandoFotos = id;
-            const prod = productos[id];
-            if (!prod) return;
-
-            const galeria = prod.imagenes || [prod.imagen || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80"];
-            const contenedor = document.getElementById('admin-galeria-miniaturas');
-
-            contenedor.innerHTML = galeria.map((imgSrc, index) => `
-                <div class="relative bg-gray-900 p-1.5 rounded-lg border border-gray-700 flex flex-col items-center justify-between">
-                    <img src="${imgSrc}" class="w-full h-20 object-cover rounded mb-1">
-                    <button onclick="eliminarImagenEspecifica('${id}', ${index})" class="w-full bg-red-900 text-red-200 text-[10px] font-bold py-1 rounded hover:bg-red-800 transition">Eliminar</button>
-                </div>
-            `).join('');
-
-            if (!silencioso) {
-                document.getElementById('modal-admin-fotos').classList.remove('hidden');
-            }
-        }
-
-        window.cerrarAdminFotos = function() {
-            idProductoEditandoFotos = null;
-            document.getElementById('modal-admin-fotos').classList.add('hidden');
-        }
-
-        window.eliminarImagenEspecifica = async function(id, indexFoto) {
-            const prod = productos[id];
-            if (!prod) return;
-
-            let galeria = prod.imagenes ? [...prod.imagenes] : [prod.imagen];
-
-            if (galeria.length <= 1) {
-                alert("El producto debe tener al menos una imagen. No se puede eliminar la última foto.");
-                return;
-            }
-
-            if (confirm("¿Estás seguro de eliminar esta foto?")) {
-                galeria.splice(indexFoto, 1);
-                try {
-                    await update(ref(db, `productos/${id}`), {
-                        imagen: galeria[0],
-                        imagenes: galeria
-                    });
-                    mostrarAlerta("Imagen eliminada correctamente.", "success");
-                } catch (err) {
-                    console.error(err);
-                    alert("Error al eliminar la imagen.");
-                }
-            }
-        }
-
-        window.subirMasFotosAProducto = async function() {
-            if (!idProductoEditandoFotos) return;
-            const prod = productos[idProductoEditandoFotos];
-            const inputFiles = document.getElementById('input-add-mas-fotos');
-
-            if (!inputFiles.files || inputFiles.files.length === 0) {
-                alert("Selecciona al menos una foto para agregar.");
-                return;
-            }
-
-            try {
-                mostrarAlerta("Subiendo nuevas fotos...", "success");
-                let nuevasFotos = prod.imagenes ? [...prod.imagenes] : [prod.imagen];
-
-                for (let i = 0; i < inputFiles.files.length; i++) {
-                    const b64 = await convertirArchivoABase64(inputFiles.files[i]);
-                    nuevasFotos.push(b64);
-                }
-
-                await update(ref(db, `productos/${idProductoEditandoFotos}`), {
-                    imagen: nuevasFotos[0],
-                    imagenes: nuevasFotos
-                });
-
-                inputFiles.value = "";
-                mostrarAlerta("¡Nuevas fotos añadidas con éxito!", "success");
-            } catch (err) {
-                console.error(err);
-                alert("Error al subir las nuevas fotos.");
-            }
-        }
-
-        window.eliminarProducto = async function(id) {
-            if (confirm("¿Estás seguro de eliminar este producto de la nube?")) {
-                try {
-                    await remove(ref(db, `productos/${id}`));
-                    mostrarAlerta("Producto eliminado.", "success");
-                } catch (err) {
-                    console.error(err);
-                    alert("Error al eliminar.");
-                }
-            }
-        }
-
         window.abrirModal = function(id) {
             const prod = productos[id];
             if (!prod) return;
-
             imagenesActualesModal = prod.imagenes || [prod.imagen || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80"];
             indiceFotoActual = 0;
-
             actualizarVistaCarrusel();
 
             document.getElementById('modal-nombre').innerText = prod.nombre;
@@ -625,10 +274,7 @@
             const btnNext = document.getElementById('btn-next-img');
             const indicador = document.getElementById('modal-indicador-foto');
 
-            if (imagenesActualesModal.length > 0) {
-                imgElement.src = imagenesActualesModal[indiceFotoActual];
-            }
-
+            if (imagenesActualesModal.length > 0) imgElement.src = imagenesActualesModal[indiceFotoActual];
             if (imagenesActualesModal.length > 1) {
                 btnPrev.classList.remove('hidden');
                 btnNext.classList.remove('hidden');
@@ -650,15 +296,12 @@
                 alert("Lo sentimos, la tienda se encuentra cerrada en este momento.");
                 return;
             }
-
             const prod = productos[id];
             const cantidadEnCarrito = carrito[id] ? carrito[id].cantidad : 0;
-
             if (prod.stock <= cantidadEnCarrito) {
                 alert("No hay suficiente stock disponible.");
                 return;
             }
-
             if (!carrito[id]) {
                 carrito[id] = { nombre: prod.nombre, precio: prod.precio, cantidad: 1 };
             } else {
@@ -670,9 +313,7 @@
         window.quitarDelCarrito = function(id) {
             if (carrito[id]) {
                 carrito[id].cantidad--;
-                if (carrito[id].cantidad <= 0) {
-                    delete carrito[id];
-                }
+                if (carrito[id].cantidad <= 0) delete carrito[id];
             }
             renderCarrito();
         }
@@ -680,12 +321,10 @@
         function renderCatalogo() {
             const grid = document.getElementById('productos-grid');
             const keys = Object.keys(productos);
-
             if (keys.length === 0) {
                 grid.innerHTML = `<p class="text-gray-400 col-span-2">No hay productos registrados en el catálogo.</p>`;
                 return;
             }
-
             grid.innerHTML = keys.map(id => {
                 const p = productos[id];
                 const sinStock = p.stock <= 0;
@@ -715,51 +354,15 @@
             }).join('');
         }
 
-        function renderAdminLista() {
-            const contenedor = document.getElementById('admin-productos-lista');
-            if (!contenedor) return;
-            const keys = Object.keys(productos);
-
-            if (keys.length === 0) {
-                contenedor.innerHTML = `<p class="text-gray-400 text-sm">No hay productos.</p>`;
-                return;
-            }
-
-            contenedor.innerHTML = keys.map(id => {
-                const p = productos[id];
-                const imgPrincipal = p.imagen || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80";
-                const totalFotos = p.imagenes ? p.imagenes.length : 1;
-                return `
-                    <div class="flex justify-between items-center bg-gray-900 p-2.5 rounded-xl text-sm border border-gray-700">
-                        <div class="flex items-center gap-2">
-                            <img src="${imgPrincipal}" class="w-10 h-10 object-cover rounded-lg border border-gray-700">
-                            <div>
-                                <span class="font-bold text-white">${p.nombre}</span><br>
-                                <span class="text-gray-400 text-xs">$${p.precio} | Stock: <strong class="text-emerald-400">${p.stock}</strong> (${totalFotos} fotos)</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <button onclick="abrirAdminFotos('${id}')" class="bg-blue-600 text-white font-bold px-2.5 py-1 rounded text-xs hover:bg-blue-500 shadow" title="Gestionar Fotos">📷 Fotos</button>
-                            <button onclick="cambiarStock('${id}', -1)" class="bg-yellow-600 text-white font-bold px-2.5 py-1 rounded text-xs hover:bg-yellow-500 shadow" title="Restar Stock">-</button>
-                            <button onclick="cambiarStock('${id}', 1)" class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded text-xs hover:bg-emerald-500 shadow" title="Sumar Stock">+</button>
-                            <button onclick="eliminarProducto('${id}')" class="bg-red-900 text-red-200 font-bold px-2 py-1 rounded text-xs hover:bg-red-800 ml-1 shadow" title="Eliminar">🗑️</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
         function renderCarrito() {
             const contenedor = document.getElementById('carrito-items');
             const keys = Object.keys(carrito);
             let total = 0;
-
             if (keys.length === 0) {
                 contenedor.innerHTML = `<p class="text-gray-400 text-sm py-2">El carrito está vacío</p>`;
                 document.getElementById('carrito-total').innerText = '$0.00';
                 return;
             }
-
             contenedor.innerHTML = keys.map(id => {
                 const item = carrito[id];
                 const subtotal = item.precio * item.cantidad;
@@ -777,95 +380,82 @@
                     </div>
                 `;
             }).join('');
-
             document.getElementById('carrito-total').innerText = `$${total.toFixed(2)}`;
         }
 
         window.finalizarPedido = async function() {
             if (!tiendaAbierta) {
-                alert("La tienda se encuentra cerrada en este momento. No se pueden enviar pedidos por WhatsApp.");
+                alert("La tienda se encuentra cerrada en este momento.");
                 return;
             }
-
             const keys = Object.keys(carrito);
             if (keys.length === 0) {
                 alert("El carrito está vacío.");
                 return;
             }
-
             const nombre = document.getElementById('cliente-nombre').value.trim();
             const ubicacion = document.getElementById('cliente-ubicacion').value.trim();
             const metodoPago = document.getElementById('cliente-pago').value;
-            
-            // Obtener hora de entrega del selector o del campo personalizado
             let horaEntrega = document.getElementById('cliente-hora').value;
             if (horaEntrega === 'especificar') {
                 horaEntrega = document.getElementById('cliente-otra-hora-input').value.trim();
             }
-
             const aceptoAcuerdo = document.getElementById('check-acuerdo').checked;
 
             if (!nombre || !ubicacion || !horaEntrega) {
-                alert("Por favor completa todos los datos de entrega (Nombre, Ubicación de Google Maps y Hora).");
+                alert("Por favor completa todos los datos de entrega.");
                 return;
             }
-
             if (!aceptoAcuerdo) {
-                alert("Debes marcar la casilla de 'De acuerdo' para poder enviar tu pedido.");
+                alert("Debes marcar la casilla de 'De acuerdo'.");
                 return;
             }
 
             try {
                 const updates = {};
+                let itemsPedidoArray = [];
+                let totalGeneral = 0;
+
                 for (let id of keys) {
                     const stockActual = productos[id].stock;
                     const comprado = carrito[id].cantidad;
-                    
                     if (stockActual < comprado) {
-                        alert(`Lo sentimos, el producto "${productos[id].nombre}" ya no tiene stock suficiente.`);
+                        alert(`Lo sentimos, el producto "${productos[id].nombre}" ya no tiene stock.`);
                         return;
                     }
                     updates[`productos/${id}/stock`] = stockActual - comprado;
+                    const sub = carrito[id].precio * comprado;
+                    totalGeneral += sub;
+                    itemsPedidoArray.push(`${comprado}x ${carrito[id].nombre} ($${sub.toFixed(2)})`);
                 }
+
+                const nuevoPedidoRef = push(ref(db, 'pedidos'));
+                await set(nuevoPedidoRef, {
+                    nombre, ubicacion, metodoPago, horaEntrega, totalGeneral,
+                    items: itemsPedidoArray,
+                    fecha: new Date().toLocaleTimeString() + " - " + new Date().toLocaleDateString()
+                });
 
                 await update(ref(db), updates);
 
                 let mensaje = `*¡NUEVO PEDIDO RECIBIDO!*%0A%0A`;
                 mensaje += `👤 *Cliente:* ${nombre}%0A`;
-                mensaje += `📍 *Ubicación / Google Maps:* ${ubicacion}%0A`;
-                mensaje += `💳 *Método de Pago:* ${metodoPago}%0A`;
-                mensaje += `⏰ *Hora de Entrega:* ${horaEntrega}%0A`;
-                
-                if (metodoPago === 'Transferencia') {
-                    mensaje += `📎 *Comprobante:* [El cliente enviará su comprobante en este chat]%0A`;
-                }
-
-                mensaje += `%0A🛒 *Detalle de Productos:*%0A`;
-
-                let totalGeneral = 0;
-                for (let id of keys) {
-                    const item = carrito[id];
-                    const sub = item.precio * item.cantidad;
-                    totalGeneral += sub;
-                    mensaje += `• ${item.cantidad}x ${item.nombre} ($${sub.toFixed(2)})%0A`;
-                }
-
-                mensaje += `%0A💰 *Total a Cobrar: *$${totalGeneral.toFixed(2)}*`;
+                mensaje += `📍 *Ubicación:* ${ubicacion}%0A`;
+                mensaje += `💳 *Pago:* ${metodoPago}%0A`;
+                mensaje += `⏰ *Entrega:* ${horaEntrega}%0A`;
+                if (metodoPago === 'Transferencia') mensaje += `📎 *Comprobante:* [El cliente enviará foto]%0A`;
+                mensaje += `%0A🛒 *Productos:*%0A`;
+                for (let itemStr of itemsPedidoArray) mensaje += `• ${itemStr}%0A`;
+                mensaje += `%0A💰 *Total:* $${totalGeneral.toFixed(2)}*`;
 
                 carrito = {};
                 renderCarrito();
                 document.getElementById('cliente-nombre').value = '';
                 document.getElementById('cliente-ubicacion').value = '';
-                document.getElementById('cliente-hora').value = 'Lo antes posible (Inmediato)';
-                document.getElementById('contenedor-otra-hora').classList.add('hidden');
-                document.getElementById('cliente-otra-hora-input').value = '';
                 document.getElementById('check-acuerdo').checked = false;
-                document.getElementById('seccion-transferencia').classList.add('hidden');
-                document.getElementById('cliente-pago').value = 'Efectivo';
 
                 window.open(`https://wa.me/529232340407?text=${mensaje}`, '_blank');
-                mostrarAlerta("¡Pedido enviado a WhatsApp y stock actualizado en la nube!", "success");
-
+                mostrarAlerta("¡Pedido enviado con éxito!", "success");
             } catch (err) {
                 console.error(err);
                 alert("Error al procesar el pedido.");
