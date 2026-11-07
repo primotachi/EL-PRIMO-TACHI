@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primo Tachi - Catálogo Online</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <div class="max-w-6xl mx-auto p-4">
+        <!-- Encabezado con el nombre Primo Tachi -->
+        <header class="bg-white shadow rounded-lg p-4 mb-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">Primo Tachi - Catálogo Online</h1>
+            <div class="flex gap-2">
+                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="bg-blue-600 text-white px-4 py-2 rounded font-semibold transition">Catálogo</button>
+                <button onclick="solicitarAccesoAdmin()" id="btn-admin" class="bg-gray-200 text-gray-700 px-4 py-2 rounded font-semibold transition">Administrar</button>
+            </div>
+        </header>
+
+        <!-- Anuncio y Horarios Dinámicos desde la Nube -->
+        <div id="banner-anuncio" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-lg shadow mb-6 hidden">
+            <h3 class="font-bold text-amber-800 text-sm">📢 Anuncio Importante:</h3>
+            <p id="texto-anuncio" class="text-xs text-amber-700 mt-1"></p>
+        </div>
+        <div class="bg-white p-3 rounded-lg shadow mb-6 text-xs text-gray-600 flex justify-between items-center">
+            <span>🕒 <strong class="text-gray-800">Horario de Atención:</strong> <span id="span-horario">Cargando horario...</span></span>
+            <span class="text-green-600 font-bold">● Abierto en Línea</span>
+        </div>
+
+        <!-- Mensaje de Estado / Alertas -->
+        <div id="status-message" class="hidden mb-4 p-3 rounded text-sm font-semibold"></div>
+
+        <!-- Vista: Catálogo y Carrito -->
+        <div id="view-catalogo" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Lista de Productos -->
+            <div class="md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Productos Disponibles</h2>
+                <div id="productos-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <p class="text-gray-500">Cargando productos en tiempo real...</p>
+                </div>
+            </div>
+
+            <!-- Carrito de Compras y Datos de Envío -->
+            <div class="bg-white p-4 rounded-lg shadow h-fit space-y-4">
+                <h2 class="text-xl font-semibold text-gray-700">Tu Carrito</h2>
+                <div id="carrito-items" class="divide-y divide-gray-200 max-h-48 overflow-y-auto">
+                    <p class="text-gray-500 text-sm py-2">El carrito está vacío</p>
+                </div>
+                <div class="border-t pt-3 flex justify-between font-bold text-lg text-gray-800">
+                    <span>Total:</span>
+                    <span id="carrito-total">$0.00</span>
+                </div>
+
+                <!-- Formulario de Datos del Comprador -->
+                <div class="border-t pt-3 space-y-3">
+                    <h3 class="font-bold text-sm text-gray-700">Datos para la Entrega</h3>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600">Nombre Completo</label>
+                        <input type="text" id="cliente-nombre" placeholder="Ej. Juan Pérez" class="w-full mt-1 p-2 text-sm border rounded-md outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-medium text-gray-600">Ubicación de Entrega</label>
+                            <a href="https://maps.google.com" target="_blank" class="text-xs text-blue-600 font-semibold hover:underline">🗺️ Abrir Google Maps</a>
+                        </div>
+                        <input type="text" id="cliente-ubicacion" placeholder="Pega aquí el enlace de Google Maps" class="w-full p-2 text-sm border rounded-md outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="text-[11px] text-gray-500 mt-1 leading-tight">
+                            📌 <em>Instrucciones: Da clic en "Abrir Google Maps", busca tu ubicación, copia el enlace y pégalo aquí.</em>
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600">Método de Pago</label>
+                            <select id="cliente-pago" onchange="verificarMetodoPago()" class="w-full mt-1 p-2 text-sm border rounded-md outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Transferencia">Transferencia</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600">Hora de Entrega</label>
+                            <input type="text" id="cliente-hora" placeholder="Ej. Lo antes posible" class="w-full mt-1 p-2 text-sm border rounded-md outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Contenedor dinámico si eligen Transferencia -->
+                    <div id="seccion-transferencia" class="hidden bg-blue-50 p-3 rounded-md border border-blue-200 space-y-2">
+                        <p class="text-sm font-bold text-blue-900">💳 DATOS PARA TRANSFERENCIA:</p>
+                        <p class="text-xs text-blue-800">CLABE: <span class="font-mono font-bold text-sm">722969015347445761</span></p>
+                        <p class="text-xs font-bold text-red-600 mt-1">⚠️ IMPORTANTE: AL FINALIZAR EL PEDIDO SE ABRIRÁ WHATSAPP Y DEBERÁS MANDAR FOTO DE TU COMPROBANTE DE PAGO.</p>
+                    </div>
+
+                    <!-- Casilla de De Acuerdo -->
+                    <div class="flex items-center gap-2 pt-2 border-t">
+                        <input type="checkbox" id="check-acuerdo" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                        <label for="check-acuerdo" class="text-xs text-gray-700 font-medium">Estoy de acuerdo con los datos de mi pedido y el método de pago seleccionado.</label>
+                    </div>
+                </div>
+
+                <button onclick="finalizarPedido()" id="btn-finalizar" class="w-full bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700 transition">
+                    Finalizar Pedido por WhatsApp
+                </button>
+            </div>
+        </div>
+
+        <!-- Vista: Panel de Administración (Protegido) -->
+        <div id="view-admin" class="hidden bg-white p-6 rounded-lg shadow max-w-xl mx-auto space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-semibold text-gray-700">Panel de Administración</h2>
+                <button onclick="cerrarAdmin()" class="text-sm bg-red-100 text-red-600 px-3 py-1 rounded font-semibold hover:bg-red-200">Salir de Admin</button>
+            </div>
+
+            <!-- Configuración de Anuncios y Horarios -->
+            <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
+                <h3 class="font-bold text-sm text-gray-700">⚙️ Configuración del Negocio</h3>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600">Aviso / Anuncio Importante</label>
+                    <textarea id="admin-anuncio" rows="2" placeholder="Ej. ¡Hoy tenemos servicio a domicilio gratis!" class="w-full mt-1 p-2 text-xs border rounded-md outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600">Horario de Atención</label>
+                    <input type="text" id="admin-horario" placeholder="Ej. Lunes a Sábado de 9:00 AM a 8:00 PM" class="w-full mt-1 p-2 text-xs border rounded-md outline-none">
+                </div>
+                <button onclick="guardarConfiguracion(event)" class="w-full bg-amber-600 text-white py-2 rounded text-xs font-bold hover:bg-amber-700 transition">
+                    Guardar Anuncio y Horarios
+                </button>
+            </div>
+            
+            <!-- Formulario de Nuevo Producto -->
+            <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-3 border-t pt-4">
+                <h3 class="font-bold text-sm text-gray-700">📦 Agregar Nuevo Producto</h3>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600">Nombre del Producto</label>
+                    <input type="text" id="prod-nombre" required class="w-full mt-1 p-2 text-sm border rounded-md outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600">Precio ($)</label>
+                    <input type="number" step="0.01" id="prod-precio" required class="w-full mt-1 p-2 text-sm border rounded-md outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600">Cantidad en Stock</label>
+                    <input type="number" id="prod-stock" required class="w-full mt-1 p-2 text-sm border rounded-md outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600">Seleccionar Foto del Producto</label>
+                    <input type="file" id="prod-imagen-file" accept="image/*" class="w-full mt-1 text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition">
+                    Guardar Producto en el Catálogo
+                </button>
+            </form>
+
+            <div class="border-t pt-4">
+                <h3 class="font-bold text-sm text-gray-700 mb-2">Inventario en la Nube</h3>
+                <div id="admin-productos-lista" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Ver Producto en Grande -->
+    <div id="modal-producto" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg max-w-md w-full overflow-hidden shadow-2xl relative">
+            <button onclick="cerrarModal()" class="absolute top-2 right-2 bg-gray-200 text-gray-700 hover:bg-gray-300 w-8 h-8 rounded-full font-bold flex items-center justify-center">✕</button>
+            <img id="modal-img" src="" alt="" class="w-full h-64 object-cover bg-gray-200">
+            <div class="p-5 space-y-3">
+                <h3 id="modal-nombre" class="font-bold text-2xl text-gray-800"></h3>
+                <p id="modal-precio" class="text-blue-600 font-bold text-xl"></p>
+                <p id="modal-stock" class="text-sm text-gray-600"></p>
+                <button id="modal-btn-agregar" onclick="" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">
+                    Agregar al Carrito
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Principal con Firebase v10 en Tiempo Real -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, update, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            databaseURL: "https://primo-tache-default-rtdb.firebaseio.com/" 
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const PASSWORD_ADMIN = "1234";
+        let productos = {};
+        let carrito = {};
+
+        onValue(ref(db, 'productos'), (snapshot) => {
+            productos = snapshot.val() || {};
+            renderCatalogo();
+            const viewAdmin = document.getElementById('view-admin');
+            if (viewAdmin && !viewAdmin.classList.contains('hidden')) {
+                renderAdminLista();
+            }
+        });
+
+        onValue(ref(db, 'config'), (snapshot) => {
+            const config = snapshot.val() || {};
+            const banner = document.getElementById('banner-anuncio');
+            const textoAnuncio = document.getElementById('texto-anuncio');
+            const spanHorario = document.getElementById('span-horario');
+
+            if (config.anuncio && config.anuncio.trim() !== "") {
+                textoAnuncio.innerText = config.anuncio;
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+
+            spanHorario.innerText = config.horario || "No especificado";
+
+            if (document.getElementById('admin-anuncio')) {
+                document.getElementById('admin-anuncio').value = config.anuncio || "";
+                document.getElementById('admin-horario').value = config.horario || "";
+            }
+        });
+
+        window.guardarConfiguracion = async function(e) {
+            e.preventDefault();
+            const anuncio = document.getElementById('admin-anuncio').value;
+            const horario = document.getElementById('admin-horario').value;
+            try {
+                await set(ref(db, 'config'), { anuncio, horario });
+                mostrarAlerta("¡Configuración actualizada con éxito!", "success");
+            } catch (err) {
+                console.error(err);
+                alert("Error al guardar la configuración.");
+            }
+        }
+
+        window.verificarMetodoPago = function() {
+            const metodo = document.getElementById('cliente-pago').value;
+            const seccionTrans = document.getElementById('seccion-transferencia');
+            if (metodo === 'Transferencia') {
+                seccionTrans.classList.remove('hidden');
+            } else {
+                seccionTrans.classList.add('hidden');
+            }
+        }
+
+        window.solicitarAccesoAdmin = function() {
+            const pass = prompt("Ingresa la contraseña de administrador:");
+            if (pass === PASSWORD_ADMIN) {
+                cambiarVista('admin');
+                renderAdminLista();
+                mostrarAlerta("Acceso concedido al panel de administración.", "success");
+            } else if (pass !== null) {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        window.cerrarAdmin = function() {
+            cambiarVista('catalogo');
+        }
+
+        window.cambiarVista = function(vista) {
+            const vCat = document.getElementById('view-catalogo');
+            const vAdm = document.getElementById('view-admin');
+            const bCat = document.getElementById('btn-catalogo');
+            const bAdm = document.getElementById('btn-admin');
+
+            if (vista === 'catalogo') {
+                vCat.classList.remove('hidden');
+                vAdm.classList.add('hidden');
+                bCat.className = "bg-blue-600 text-white px-4 py-2 rounded font-semibold transition";
+                bAdm.className = "bg-gray-200 text-gray-700 px-4 py-2 rounded font-semibold transition";
+            } else {
+                vCat.classList.add('hidden');
+                vAdm.classList.remove('hidden');
+                bAdm.className = "bg-blue-600 text-white px-4 py-2 rounded font-semibold transition";
+                bCat.className = "bg-gray-200 text-gray-700 px-4 py-2 rounded font-semibold transition";
+                renderAdminLista();
+            }
+        }
+
+        function convertirImagenABase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        window.guardarProducto = async function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('prod-nombre').value;
+            const precio = parseFloat(document.getElementById('prod-precio').value);
+            const stock = parseInt(document.getElementById('prod-stock').value);
+            const inputArchivo = document.getElementById('prod-imagen-file');
+
+            let imagenUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80";
+
+            try {
+                if (inputArchivo.files && inputArchivo.files[0]) {
+                    mostrarAlerta("Procesando imagen...", "success");
+                    imagenUrl = await convertirImagenABase64(inputArchivo.files[0]);
+                }
+
+                const nuevoRef = push(ref(db, 'productos'));
+                await set(nuevoRef, { nombre, precio, stock, imagen: imagenUrl });
+                document.getElementById('form-producto').reset();
+                mostrarAlerta("¡Producto guardado y sincronizado en la nube!", "success");
+            } catch (err) {
+                console.error(err);
+                alert("Error al procesar la imagen o guardar el producto.");
+            }
+        }
+
+        window.cambiarStock = async function(id, cantidadCambio) {
+            const prod = productos[id];
+            if (!prod) return;
+            const nuevoStock = prod.stock + cantidadCambio;
+            if (nuevoStock < 0) {
+                alert("El stock no puede ser menor a 0.");
+                return;
+            }
+            try {
+                await update(ref(db, `productos/${id}`), { stock: nuevoStock });
+            } catch (err) {
+                console.error(err);
+                alert("Error al actualizar el stock.");
+            }
+        }
+
+        window.cambiarImagen = async function(id) {
+            const prod = productos[id];
+            if (!prod) return;
+            const inputTemp = document.createElement('input');
+            inputTemp.type = 'file';
+            inputTemp.accept = 'image/*';
+            inputTemp.onchange = async e => {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        mostrarAlerta("Actualizando imagen...", "success");
+                        const nuevaBase64 = await convertirImagenABase64(file);
+                        await update(ref(db, `productos/${id}`), { imagen: nuevaBase64 });
+                        mostrarAlerta("¡Imagen actualizada con éxito!", "success");
+                    } catch (err) {
+                        console.error(err);
+                        alert("No se pudo actualizar la imagen.");
+                    }
+                }
+            };
+            inputTemp.click();
+        }
+
+        window.eliminarProducto = async function(id) {
+            if (confirm("¿Estás seguro de eliminar este producto de la nube?")) {
+                try {
+                    await remove(ref(db, `productos/${id}`));
+                    mostrarAlerta("Producto eliminado.", "success");
+                } catch (err) {
+                    console.error(err);
+                    alert("Error al eliminar.");
+                }
+            }
+        }
+
+        window.abrirModal = function(id) {
+            const prod = productos[id];
+            if (!prod) return;
+            document.getElementById('modal-img').src = prod.imagen;
+            document.getElementById('modal-nombre').innerText = prod.nombre;
+            document.getElementById('modal-precio').innerText = `$${prod.precio.toFixed(2)}`;
+            document.getElementById('modal-stock').innerHTML = `Stock disponible: <strong>${prod.stock}</strong>`;
+            
+            const btnAgregar = document.getElementById('modal-btn-agregar');
+            if (prod.stock <= 0) {
+                btnAgregar.innerText = "Agotado";
+                btnAgregar.className = "w-full bg-gray-400 text-white py-3 rounded-lg font-bold cursor-not-allowed";
+                btnAgregar.disabled = true;
+            } else {
+                btnAgregar.innerText = "Agregar al Carrito";
+                btnAgregar.className = "w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition";
+                btnAgregar.disabled = false;
+                btnAgregar.onclick = function() {
+                    agregarAlCarrito(id);
+                    cerrarModal();
+                };
+            }
+            document.getElementById('modal-producto').classList.remove('hidden');
+        }
+
+        window.cerrarModal = function() {
+            document.getElementById('modal-producto').classList.add('hidden');
+        }
+
+        window.agregarAlCarrito = function(id) {
+            const prod = productos[id];
+            const cantidadEnCarrito = carrito[id] ? carrito[id].cantidad : 0;
+
+            if (prod.stock <= cantidadEnCarrito) {
+                alert("No hay suficiente stock disponible.");
+                return;
+            }
+
+            if (!carrito[id]) {
+                carrito[id] = { nombre: prod.nombre, precio: prod.precio, cantidad: 1 };
+            } else {
+                carrito[id].cantidad++;
+            }
+            renderCarrito();
+        }
+
+        window.quitarDelCarrito = function(id) {
+            if (carrito[id]) {
+                carrito[id].cantidad--;
+                if (carrito[id].cantidad <= 0) {
+                    delete carrito[id];
+                }
+            }
+            renderCarrito();
+        }
+
+        function renderCatalogo() {
+            const grid = document.getElementById('productos-grid');
+            const keys = Object.keys(productos);
+
+            if (keys.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 col-span-2">No hay productos registrados en el catálogo.</p>`;
+                return;
+            }
+
+            grid.innerHTML = keys.map(id => {
+                const p = productos[id];
+                const sinStock = p.stock <= 0;
+                return `
+                    <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col justify-between cursor-pointer hover:shadow-lg transition">
+                        <img src="${p.imagen}" alt="${p.nombre}" onclick="abrirModal('${id}')" class="w-full h-36 object-cover bg-gray-200">
+                        <div class="p-4 flex flex-col justify-between flex-grow">
+                            <div onclick="abrirModal('${id}')">
+                                <h3 class="font-bold text-lg text-gray-800 hover:text-blue-600 transition">${p.nombre}</h3>
+                                <p class="text-blue-600 font-semibold mb-1">$${p.precio.toFixed(2)}</p>
+                                <p class="text-xs text-gray-500 mb-3">Stock disponible: <span class="font-bold text-gray-700">${p.stock}</span></p>
+                            </div>
+                            <button onclick="agregarAlCarrito('${id}')" 
+                                class="w-full py-2 rounded font-semibold text-white transition ${sinStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}"
+                                ${sinStock ? 'disabled' : ''}>
+                                ${sinStock ? 'Agotado' : 'Agregar al Carrito'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAdminLista() {
+            const contenedor = document.getElementById('admin-productos-lista');
+            if (!contenedor) return;
+            const keys = Object.keys(productos);
+
+            if (keys.length === 0) {
+                contenedor.innerHTML = `<p class="text-gray-400 text-sm">No hay productos.</p>`;
+                return;
+            }
+
+            contenedor.innerHTML = keys.map(id => {
+                const p = productos[id];
+                return `
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded text-sm border">
+                        <div class="flex items-center gap-2">
+                            <img src="${p.imagen}" class="w-10 h-10 object-cover rounded">
+                            <div>
+                                <span class="font-bold text-gray-800">${p.nombre}</span><br>
+                                <span class="text-gray-500 text-xs">$${p.precio} | Stock: <strong class="text-blue-600">${p.stock}</strong></span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="cambiarImagen('${id}')" class="bg-blue-500 text-white font-bold px-2 py-1 rounded text-xs hover:bg-blue-600" title="Subir o Cambiar Foto">📷 Foto</button>
+                            <button onclick="cambiarStock('${id}', -1)" class="bg-yellow-500 text-white font-bold px-2 py-1 rounded text-xs hover:bg-yellow-600" title="Restar Stock">-</button>
+                            <button onclick="cambiarStock('${id}', 1)" class="bg-green-500 text-white font-bold px-2 py-1 rounded text-xs hover:bg-green-600" title="Sumar Stock">+</button>
+                            <button onclick="eliminarProducto('${id}')" class="bg-red-100 text-red-600 font-bold px-2 py-1 rounded text-xs hover:bg-red-200 ml-1" title="Eliminar">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCarrito() {
+            const contenedor = document.getElementById('carrito-items');
+            const keys = Object.keys(carrito);
+            let total = 0;
+
+            if (keys.length === 0) {
+                contenedor.innerHTML = `<p class="text-gray-500 text-sm py-2">El carrito está vacío</p>`;
+                document.getElementById('carrito-total').innerText = '$0.00';
+                return;
+            }
+
+            contenedor.innerHTML = keys.map(id => {
+                const item = carrito[id];
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                return `
+                    <div class="py-2 flex justify-between items-center text-sm">
+                        <div>
+                            <p class="font-semibold text-gray-800">${item.nombre}</p>
+                            <p class="text-gray-500">$${item.precio} x ${item.cantidad}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-gray-700">$${subtotal.toFixed(2)}</span>
+                            <button onclick="quitarDelCarrito('${id}')" class="text-red-500 font-bold px-2 py-1 bg-red-50 rounded hover:bg-red-100">-</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('carrito-total').innerText = `$${total.toFixed(2)}`;
+        }
+
+        window.finalizarPedido = async function() {
+            const keys = Object.keys(carrito);
+            if (keys.length === 0) {
+                alert("El carrito está vacío.");
+                return;
+            }
+
+            const nombre = document.getElementById('cliente-nombre').value.trim();
+            const ubicacion = document.getElementById('cliente-ubicacion').value.trim();
+            const metodoPago = document.getElementById('cliente-pago').value;
+            const horaEntrega = document.getElementById('cliente-hora').value.trim();
+            const aceptoAcuerdo = document.getElementById('check-acuerdo').checked;
+
+            if (!nombre || !ubicacion || !horaEntrega) {
+                alert("Por favor completa todos los datos de entrega (Nombre, Ubicación de Google Maps y Hora).");
+                return;
+            }
+
+            if (!aceptoAcuerdo) {
+                alert("Debes marcar la casilla de 'De acuerdo' para poder enviar tu pedido.");
+                return;
+            }
+
+            try {
+                const updates = {};
+                for (let id of keys) {
+                    const stockActual = productos[id].stock;
+                    const comprado = carrito[id].cantidad;
+                    
+                    if (stockActual < comprado) {
+                        alert(`Lo sentimos, el producto "${productos[id].nombre}" ya no tiene stock suficiente.`);
+                        return;
+                    }
+                    updates[`productos/${id}/stock`] = stockActual - comprado;
+                }
+
+                await update(ref(db), updates);
+
+                let mensaje = `*¡NUEVO PEDIDO RECIBIDO!*%0A%0A`;
+                mensaje += `👤 *Cliente:* ${nombre}%0A`;
+                mensaje += `📍 *Ubicación / Google Maps:* ${ubicacion}%0A`;
+                mensaje += `💳 *Método de Pago:* ${metodoPago}%0A`;
+                mensaje += `⏰ *Hora de Entrega:* ${horaEntrega}%0A`;
+                
+                if (metodoPago === 'Transferencia') {
+                    mensaje += `📎 *Comprobante:* [El cliente enviará su comprobante en este chat]%0A`;
+                }
+
+                mensaje += `%0A🛒 *Detalle de Productos:*%0A`;
+
+                let totalGeneral = 0;
+                for (let id of keys) {
+                    const item = carrito[id];
+                    const sub = item.precio * item.cantidad;
+                    totalGeneral += sub;
+                    mensaje += `• ${item.cantidad}x ${item.nombre} ($${sub.toFixed(2)})%0A`;
+                }
+
+                mensaje += `%0A💰 *Total a Cobrar: *$${totalGeneral.toFixed(2)}*`;
+
+                carrito = {};
+                renderCarrito();
+                document.getElementById('cliente-nombre').value = '';
+                document.getElementById('cliente-ubicacion').value = '';
+                document.getElementById('cliente-hora').value = '';
+                document.getElementById('check-acuerdo').checked = false;
+                document.getElementById('seccion-transferencia').classList.add('hidden');
+                document.getElementById('cliente-pago').value = 'Efectivo';
+
+                window.open(`https://wa.me/529625999518?text=${mensaje}`, '_blank');
+                mostrarAlerta("¡Pedido enviado a WhatsApp y stock actualizado en la nube!", "success");
+
+            } catch (err) {
+                console.error(err);
+                alert("Error al procesar el pedido.");
+            }
+        }
+
+        function mostrarAlerta(texto, tipo) {
+            const alerta = document.getElementById('status-message');
+            alerta.innerText = texto;
+            alerta.className = `mb-4 p-3 rounded text-sm font-semibold ${tipo === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+            alerta.classList.remove('hidden');
+            setTimeout(() => alerta.classList.add('hidden'), 4000);
+        }
+    </script>
+</body>
+</html>
