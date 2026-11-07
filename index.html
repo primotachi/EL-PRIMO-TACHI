@@ -84,7 +84,8 @@
                             📌 <em>Instrucciones: Da clic en "Abrir Google Maps", busca tu ubicación, copia el enlace y pégalo aquí.</em>
                         </p>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    
+                    <div class="grid grid-cols-1 gap-2">
                         <div>
                             <label class="block text-xs font-medium text-gray-300">Método de Pago</label>
                             <select id="cliente-pago" onchange="verificarMetodoPago()" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
@@ -94,7 +95,18 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-300">Hora de Entrega</label>
-                            <input type="text" id="cliente-hora" placeholder="Ej. Lo antes posible" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
+                            <select id="cliente-hora" onchange="verificarHoraSeleccionada()" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
+                                <option value="Lo antes posible (Inmediato)">Lo antes posible (Inmediato)</option>
+                                <option value="En 30 minutos">En 30 minutos</option>
+                                <option value="En 1 hora">En 1 hora</option>
+                                <option value="Hoy por la tarde (4:00 PM - 6:00 PM)">Hoy por la tarde (4:00 PM - 6:00 PM)</option>
+                                <option value="Hoy por la noche (7:00 PM - 9:00 PM)">Hoy por la noche (7:00 PM - 9:00 PM)</option>
+                                <option value="especificar">Otra hora específica...</option>
+                            </select>
+                        </div>
+                        <!-- Campo oculto por si eligen hora específica -->
+                        <div id="contenedor-otra-hora" class="hidden">
+                            <input type="text" id="cliente-otra-hora-input" placeholder="Escribe la hora exacta (Ej. 5:30 PM)" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
                         </div>
                     </div>
 
@@ -235,12 +247,10 @@
             </div>
             <p class="text-xs text-gray-300">Aquí puedes ver todas las imágenes actuales del producto. Elimina las que no desees o agrega nuevas fotos.</p>
             
-            <!-- Contenedor de miniaturas para eliminar -->
             <div id="admin-galeria-miniaturas" class="grid grid-cols-3 gap-3 max-h-56 overflow-y-auto p-1 bg-gray-950 rounded-lg border border-gray-800">
                 <!-- Se cargan dinámicamente -->
             </div>
 
-            <!-- Botón para añadir más fotos a este producto -->
             <div class="pt-2 border-t border-gray-800">
                 <label class="block text-xs font-medium text-gray-300 mb-1">Añadir más fotos a este producto:</label>
                 <div class="flex gap-2">
@@ -335,6 +345,16 @@
             const ahora = new Date();
             const horaActual = ahora.getHours() + ahora.getMinutes() / 60;
             return horaActual >= apertura && horaActual <= cierre;
+        }
+
+        window.verificarHoraSeleccionada = function() {
+            const selector = document.getElementById('cliente-hora').value;
+            const contenedorOtra = document.getElementById('contenedor-otra-hora');
+            if (selector === 'especificar') {
+                contenedorOtra.classList.remove('hidden');
+            } else {
+                contenedorOtra.classList.add('hidden');
+            }
         }
 
         window.guardarConfiguracion = async function(e) {
@@ -722,7 +742,7 @@
                             <button onclick="abrirAdminFotos('${id}')" class="bg-blue-600 text-white font-bold px-2.5 py-1 rounded text-xs hover:bg-blue-500 shadow" title="Gestionar Fotos">📷 Fotos</button>
                             <button onclick="cambiarStock('${id}', -1)" class="bg-yellow-600 text-white font-bold px-2.5 py-1 rounded text-xs hover:bg-yellow-500 shadow" title="Restar Stock">-</button>
                             <button onclick="cambiarStock('${id}', 1)" class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded text-xs hover:bg-emerald-500 shadow" title="Sumar Stock">+</button>
-                            <button onclick="eliminarProducto('${id}')" class="bg-red-900 text-red-200 font-bold px-2.5 py-1 rounded text-xs hover:bg-red-800 ml-1 shadow" title="Eliminar">🗑️</button>
+                            <button onclick="eliminarProducto('${id}')" class="bg-red-900 text-red-200 font-bold px-2 py-1 rounded text-xs hover:bg-red-800 ml-1 shadow" title="Eliminar">🗑️</button>
                         </div>
                     </div>
                 `;
@@ -776,7 +796,13 @@
             const nombre = document.getElementById('cliente-nombre').value.trim();
             const ubicacion = document.getElementById('cliente-ubicacion').value.trim();
             const metodoPago = document.getElementById('cliente-pago').value;
-            const horaEntrega = document.getElementById('cliente-hora').value.trim();
+            
+            // Obtener hora de entrega del selector o del campo personalizado
+            let horaEntrega = document.getElementById('cliente-hora').value;
+            if (horaEntrega === 'especificar') {
+                horaEntrega = document.getElementById('cliente-otra-hora-input').value.trim();
+            }
+
             const aceptoAcuerdo = document.getElementById('check-acuerdo').checked;
 
             if (!nombre || !ubicacion || !horaEntrega) {
@@ -830,7 +856,9 @@
                 renderCarrito();
                 document.getElementById('cliente-nombre').value = '';
                 document.getElementById('cliente-ubicacion').value = '';
-                document.getElementById('cliente-hora').value = '';
+                document.getElementById('cliente-hora').value = 'Lo antes posible (Inmediato)';
+                document.getElementById('contenedor-otra-hora').classList.add('hidden');
+                document.getElementById('cliente-otra-hora-input').value = '';
                 document.getElementById('check-acuerdo').checked = false;
                 document.getElementById('seccion-transferencia').classList.add('hidden');
                 document.getElementById('cliente-pago').value = 'Efectivo';
