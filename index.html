@@ -6,168 +6,182 @@
     <title>Primo Tachi - Catálogo Online</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Patrón de fondo estilo retro / 8 bits inspirado en mapaches */
+        body {
+            background-color: #212529;
+            background-image: 
+                radial-gradient(ellipse at center, rgba(52, 58, 64, 0.8) 0%, rgba(33, 37, 41, 1) 100%),
+                linear-gradient(45deg, #2b3035 25%, transparent 25%), 
+                linear-gradient(-45deg, #2b3035 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #2b3035 75%), 
+                linear-gradient(-45deg, transparent 75%, #2b3035 75%);
+            background-size: 100% 100%, 32px 32px, 32px 32px, 32px 32px, 32px 32px;
+            background-position: 0 0, 0 0, 0 16px, 16px -16px, -16px 0px;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="min-h-screen text-gray-100">
 
     <div class="max-w-6xl mx-auto p-4">
-        <!-- Encabezado con el nombre Primo Tachi -->
-        <header class="bg-white shadow rounded-lg p-4 mb-6 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">Primo Tachi - Catálogo Online</h1>
+        <!-- Encabezado -->
+        <header class="bg-gray-800 border border-gray-700 shadow-xl rounded-xl p-4 mb-6 flex justify-between items-center">
+            <h1 class="text-2xl font-extrabold text-emerald-400 tracking-wide">🦝 Primo Tachi - Catálogo Online</h1>
             <div class="flex gap-2">
-                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="bg-blue-600 text-white px-4 py-2 rounded font-semibold transition">Catálogo</button>
-                <button onclick="solicitarAccesoAdmin()" id="btn-admin" class="bg-gray-200 text-gray-700 px-4 py-2 rounded font-semibold transition">Administrar</button>
+                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold transition shadow">Catálogo</button>
+                <button onclick="solicitarAccesoAdmin()" id="btn-admin" class="bg-gray-700 text-gray-200 px-4 py-2 rounded-lg font-semibold transition hover:bg-gray-600 shadow">Administrar</button>
             </div>
         </header>
 
         <!-- Anuncio y Horarios Dinámicos desde la Nube -->
-        <div id="banner-anuncio" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-lg shadow mb-6 hidden">
-            <h3 class="font-bold text-amber-800 text-sm">📢 Anuncio Importante:</h3>
-            <p id="texto-anuncio" class="text-xs text-amber-700 mt-1"></p>
+        <div id="banner-anuncio" class="bg-gray-800 border-l-4 border-emerald-500 p-4 rounded-xl shadow-lg mb-6 hidden">
+            <h3 class="font-bold text-emerald-400 text-sm">📢 Anuncio Importante:</h3>
+            <p id="texto-anuncio" class="text-xs text-gray-300 mt-1"></p>
         </div>
-        <div class="bg-white p-3 rounded-lg shadow mb-6 text-xs text-gray-600 flex justify-between items-center">
-            <span>🕒 <strong class="text-gray-800">Horario de Atención:</strong> <span id="span-horario">Cargando horario...</span></span>
-            <span class="text-green-600 font-bold">● Abierto en Línea</span>
+        <div class="bg-gray-800 border border-gray-700 p-3 rounded-xl shadow mb-6 text-xs text-gray-300 flex justify-between items-center">
+            <span>🕒 <strong class="text-white">Horario de Atención:</strong> <span id="span-horario" class="text-emerald-400">Cargando horario...</span></span>
+            <span class="text-emerald-400 font-bold bg-emerald-950 px-2 py-1 rounded border border-emerald-800">● Abierto en Línea</span>
         </div>
 
         <!-- Mensaje de Estado / Alertas -->
-        <div id="status-message" class="hidden mb-4 p-3 rounded text-sm font-semibold"></div>
+        <div id="status-message" class="hidden mb-4 p-3 rounded-xl text-sm font-semibold shadow"></div>
 
         <!-- Vista: Catálogo y Carrito -->
         <div id="view-catalogo" class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Lista de Productos -->
             <div class="md:col-span-2">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">Productos Disponibles</h2>
+                <h2 class="text-xl font-semibold mb-4 text-emerald-400 border-b border-gray-700 pb-2">Productos Disponibles</h2>
                 <div id="productos-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <p class="text-gray-500">Cargando productos en tiempo real...</p>
+                    <p class="text-gray-400">Cargando productos en tiempo real...</p>
                 </div>
             </div>
 
             <!-- Carrito de Compras y Datos de Envío -->
-            <div class="bg-white p-4 rounded-lg shadow h-fit space-y-4">
-                <h2 class="text-xl font-semibold text-gray-700">Tu Carrito</h2>
-                <div id="carrito-items" class="divide-y divide-gray-200 max-h-48 overflow-y-auto">
-                    <p class="text-gray-500 text-sm py-2">El carrito está vacío</p>
+            <div class="bg-gray-800 border border-gray-700 p-5 rounded-xl shadow-xl h-fit space-y-4">
+                <h2 class="text-xl font-semibold text-emerald-400 border-b border-gray-700 pb-2">Tu Carrito</h2>
+                <div id="carrito-items" class="divide-y divide-gray-700 max-h-48 overflow-y-auto pr-1">
+                    <p class="text-gray-400 text-sm py-2">El carrito está vacío</p>
                 </div>
-                <div class="border-t pt-3 flex justify-between font-bold text-lg text-gray-800">
+                <div class="border-t border-gray-700 pt-3 flex justify-between font-bold text-lg text-white">
                     <span>Total:</span>
-                    <span id="carrito-total">$0.00</span>
+                    <span id="carrito-total" class="text-emerald-400">$0.00</span>
                 </div>
 
                 <!-- Formulario de Datos del Comprador -->
-                <div class="border-t pt-3 space-y-3">
-                    <h3 class="font-bold text-sm text-gray-700">Datos para la Entrega</h3>
+                <div class="border-t border-gray-700 pt-3 space-y-3">
+                    <h3 class="font-bold text-sm text-emerald-300">Datos para la Entrega</h3>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600">Nombre Completo</label>
-                        <input type="text" id="cliente-nombre" placeholder="Ej. Juan Pérez" class="w-full mt-1 p-2 text-sm border rounded-md outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-medium text-gray-300">Nombre Completo</label>
+                        <input type="text" id="cliente-nombre" placeholder="Ej. Juan Pérez" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="block text-xs font-medium text-gray-600">Ubicación de Entrega</label>
-                            <a href="https://maps.google.com" target="_blank" class="text-xs text-blue-600 font-semibold hover:underline">🗺️ Abrir Google Maps</a>
+                            <label class="block text-xs font-medium text-gray-300">Ubicación de Entrega</label>
+                            <a href="https://maps.google.com" target="_blank" class="text-xs text-emerald-400 font-semibold hover:underline">🗺️ Abrir Google Maps</a>
                         </div>
-                        <input type="text" id="cliente-ubicacion" placeholder="Pega aquí el enlace de Google Maps" class="w-full p-2 text-sm border rounded-md outline-none focus:ring-2 focus:ring-blue-500">
-                        <p class="text-[11px] text-gray-500 mt-1 leading-tight">
+                        <input type="text" id="cliente-ubicacion" placeholder="Pega aquí el enlace de Google Maps" class="w-full p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
+                        <p class="text-[11px] text-gray-400 mt-1 leading-tight">
                             📌 <em>Instrucciones: Da clic en "Abrir Google Maps", busca tu ubicación, copia el enlace y pégalo aquí.</em>
                         </p>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600">Método de Pago</label>
-                            <select id="cliente-pago" onchange="verificarMetodoPago()" class="w-full mt-1 p-2 text-sm border rounded-md outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-medium text-gray-300">Método de Pago</label>
+                            <select id="cliente-pago" onchange="verificarMetodoPago()" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
                                 <option value="Efectivo">Efectivo</option>
                                 <option value="Transferencia">Transferencia</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600">Hora de Entrega</label>
-                            <input type="text" id="cliente-hora" placeholder="Ej. Lo antes posible" class="w-full mt-1 p-2 text-sm border rounded-md outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-medium text-gray-300">Hora de Entrega</label>
+                            <input type="text" id="cliente-hora" placeholder="Ej. Lo antes posible" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
                         </div>
                     </div>
 
                     <!-- Contenedor dinámico si eligen Transferencia -->
-                    <div id="seccion-transferencia" class="hidden bg-blue-50 p-3 rounded-md border border-blue-200 space-y-2">
-                        <p class="text-sm font-bold text-blue-900">💳 DATOS PARA TRANSFERENCIA:</p>
-                        <p class="text-xs text-blue-800">CLABE: <span class="font-mono font-bold text-sm">722969015347445761</span></p>
-                        <p class="text-xs font-bold text-red-600 mt-1">⚠️ IMPORTANTE: AL FINALIZAR EL PEDIDO SE ABRIRÁ WHATSAPP Y DEBERÁS MANDAR FOTO DE TU COMPROBANTE DE PAGO.</p>
+                    <div id="seccion-transferencia" class="hidden bg-gray-900 p-3 rounded-lg border border-emerald-700 space-y-2">
+                        <p class="text-sm font-bold text-emerald-400">💳 DATOS PARA TRANSFERENCIA:</p>
+                        <p class="text-xs text-gray-300">CLABE: <span class="font-mono font-bold text-sm text-emerald-300">722969015347445761</span></p>
+                        <p class="text-xs font-bold text-amber-400 mt-1">⚠️ IMPORTANTE: AL FINALIZAR EL PEDIDO SE ABRIRÁ WHATSAPP Y DEBERÁS MANDAR FOTO DE TU COMPROBANTE DE PAGO.</p>
                     </div>
 
                     <!-- Casilla de De Acuerdo -->
-                    <div class="flex items-center gap-2 pt-2 border-t">
-                        <input type="checkbox" id="check-acuerdo" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                        <label for="check-acuerdo" class="text-xs text-gray-700 font-medium">Estoy de acuerdo con los datos de mi pedido y el método de pago seleccionado.</label>
+                    <div class="flex items-center gap-2 pt-2 border-t border-gray-700">
+                        <input type="checkbox" id="check-acuerdo" class="w-4 h-4 text-emerald-600 rounded border-gray-700 bg-gray-900 focus:ring-emerald-500">
+                        <label for="check-acuerdo" class="text-xs text-gray-300 font-medium">Estoy de acuerdo con los datos de mi pedido y el método de pago seleccionado.</label>
                     </div>
                 </div>
 
-                <button onclick="finalizarPedido()" id="btn-finalizar" class="w-full bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700 transition">
+                <button onclick="finalizarPedido()" id="btn-finalizar" class="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-bold hover:bg-emerald-500 transition shadow-lg">
                     Finalizar Pedido por WhatsApp
                 </button>
             </div>
         </div>
 
         <!-- Vista: Panel de Administración (Protegido) -->
-        <div id="view-admin" class="hidden bg-white p-6 rounded-lg shadow max-w-xl mx-auto space-y-6">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-700">Panel de Administración</h2>
-                <button onclick="cerrarAdmin()" class="text-sm bg-red-100 text-red-600 px-3 py-1 rounded font-semibold hover:bg-red-200">Salir de Admin</button>
+        <div id="view-admin" class="hidden bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-2xl max-w-xl mx-auto space-y-6">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+                <h2 class="text-xl font-semibold text-emerald-400">Panel de Administración</h2>
+                <button onclick="cerrarAdmin()" class="text-sm bg-red-900 text-red-200 px-3 py-1 rounded-lg font-semibold hover:bg-red-800 transition">Salir de Admin</button>
             </div>
 
             <!-- Configuración de Anuncios y Horarios -->
-            <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
-                <h3 class="font-bold text-sm text-gray-700">⚙️ Configuración del Negocio</h3>
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-700 space-y-3">
+                <h3 class="font-bold text-sm text-emerald-400">⚙️ Configuración del Negocio</h3>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600">Aviso / Anuncio Importante</label>
-                    <textarea id="admin-anuncio" rows="2" placeholder="Ej. ¡Hoy tenemos servicio a domicilio gratis!" class="w-full mt-1 p-2 text-xs border rounded-md outline-none"></textarea>
+                    <label class="block text-xs font-medium text-gray-300">Aviso / Anuncio Importante</label>
+                    <textarea id="admin-anuncio" rows="2" placeholder="Ej. ¡Hoy tenemos servicio a domicilio gratis!" class="w-full mt-1 p-2 text-xs bg-gray-800 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600">Horario de Atención</label>
-                    <input type="text" id="admin-horario" placeholder="Ej. Lunes a Sábado de 9:00 AM a 8:00 PM" class="w-full mt-1 p-2 text-xs border rounded-md outline-none">
+                    <label class="block text-xs font-medium text-gray-300">Horario de Atención</label>
+                    <input type="text" id="admin-horario" placeholder="Ej. Lunes a Sábado de 9:00 AM a 8:00 PM" class="w-full mt-1 p-2 text-xs bg-gray-800 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
                 </div>
-                <button onclick="guardarConfiguracion(event)" class="w-full bg-amber-600 text-white py-2 rounded text-xs font-bold hover:bg-amber-700 transition">
+                <button onclick="guardarConfiguracion(event)" class="w-full bg-amber-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-amber-500 transition">
                     Guardar Anuncio y Horarios
                 </button>
             </div>
             
             <!-- Formulario de Nuevo Producto -->
-            <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-3 border-t pt-4">
-                <h3 class="font-bold text-sm text-gray-700">📦 Agregar Nuevo Producto</h3>
+            <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-3 border-t border-gray-700 pt-4">
+                <h3 class="font-bold text-sm text-emerald-400">📦 Agregar Nuevo Producto</h3>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600">Nombre del Producto</label>
-                    <input type="text" id="prod-nombre" required class="w-full mt-1 p-2 text-sm border rounded-md outline-none">
+                    <label class="block text-xs font-medium text-gray-300">Nombre del Producto</label>
+                    <input type="text" id="prod-nombre" required class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600">Precio ($)</label>
-                    <input type="number" step="0.01" id="prod-precio" required class="w-full mt-1 p-2 text-sm border rounded-md outline-none">
+                    <label class="block text-xs font-medium text-gray-300">Precio ($)</label>
+                    <input type="number" step="0.01" id="prod-precio" required class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600">Cantidad en Stock</label>
-                    <input type="number" id="prod-stock" required class="w-full mt-1 p-2 text-sm border rounded-md outline-none">
+                    <label class="block text-xs font-medium text-gray-300">Cantidad en Stock</label>
+                    <input type="number" id="prod-stock" required class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600">Seleccionar Foto del Producto</label>
-                    <input type="file" id="prod-imagen-file" accept="image/*" class="w-full mt-1 text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                    <label class="block text-xs font-medium text-gray-300">Seleccionar Foto del Producto</label>
+                    <input type="file" id="prod-imagen-file" accept="image/*" class="w-full mt-1 text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
                 </div>
-                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition">
+                <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-bold hover:bg-emerald-500 transition shadow">
                     Guardar Producto en el Catálogo
                 </button>
             </form>
 
-            <div class="border-t pt-4">
-                <h3 class="font-bold text-sm text-gray-700 mb-2">Inventario en la Nube</h3>
-                <div id="admin-productos-lista" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            <div class="border-t border-gray-700 pt-4">
+                <h3 class="font-bold text-sm text-emerald-400 mb-2">Inventario en la Nube</h3>
+                <div id="admin-productos-lista" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
             </div>
         </div>
     </div>
 
     <!-- Modal para Ver Producto en Grande -->
-    <div id="modal-producto" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-lg max-w-md w-full overflow-hidden shadow-2xl relative">
-            <button onclick="cerrarModal()" class="absolute top-2 right-2 bg-gray-200 text-gray-700 hover:bg-gray-300 w-8 h-8 rounded-full font-bold flex items-center justify-center">✕</button>
-            <img id="modal-img" src="" alt="" class="w-full h-64 object-cover bg-gray-200">
+    <div id="modal-producto" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-gray-900 border border-gray-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative">
+            <button onclick="cerrarModal()" class="absolute top-2 right-2 bg-gray-800 text-gray-300 hover:bg-gray-700 w-8 h-8 rounded-full font-bold flex items-center justify-center shadow">✕</button>
+            <img id="modal-img" src="" alt="" class="w-full h-64 object-cover bg-gray-800">
             <div class="p-5 space-y-3">
-                <h3 id="modal-nombre" class="font-bold text-2xl text-gray-800"></h3>
-                <p id="modal-precio" class="text-blue-600 font-bold text-xl"></p>
-                <p id="modal-stock" class="text-sm text-gray-600"></p>
-                <button id="modal-btn-agregar" onclick="" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">
+                <h3 id="modal-nombre" class="font-bold text-2xl text-white"></h3>
+                <p id="modal-precio" class="text-emerald-400 font-bold text-xl"></p>
+                <p id="modal-stock" class="text-sm text-gray-300"></p>
+                <button id="modal-btn-agregar" onclick="" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-500 transition shadow-lg">
                     Agregar al Carrito
                 </button>
             </div>
@@ -267,13 +281,13 @@
             if (vista === 'catalogo') {
                 vCat.classList.remove('hidden');
                 vAdm.classList.add('hidden');
-                bCat.className = "bg-blue-600 text-white px-4 py-2 rounded font-semibold transition";
-                bAdm.className = "bg-gray-200 text-gray-700 px-4 py-2 rounded font-semibold transition";
+                bCat.className = "bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold transition shadow";
+                bAdm.className = "bg-gray-700 text-gray-200 px-4 py-2 rounded-lg font-semibold transition hover:bg-gray-600 shadow";
             } else {
                 vCat.classList.add('hidden');
                 vAdm.classList.remove('hidden');
-                bAdm.className = "bg-blue-600 text-white px-4 py-2 rounded font-semibold transition";
-                bCat.className = "bg-gray-200 text-gray-700 px-4 py-2 rounded font-semibold transition";
+                bAdm.className = "bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold transition shadow";
+                bCat.className = "bg-gray-700 text-gray-200 px-4 py-2 rounded-lg font-semibold transition hover:bg-gray-600 shadow";
                 renderAdminLista();
             }
         }
@@ -369,16 +383,16 @@
             document.getElementById('modal-img').src = prod.imagen;
             document.getElementById('modal-nombre').innerText = prod.nombre;
             document.getElementById('modal-precio').innerText = `$${prod.precio.toFixed(2)}`;
-            document.getElementById('modal-stock').innerHTML = `Stock disponible: <strong>${prod.stock}</strong>`;
+            document.getElementById('modal-stock').innerHTML = `Stock disponible: <strong class="text-white">${prod.stock}</strong>`;
             
             const btnAgregar = document.getElementById('modal-btn-agregar');
             if (prod.stock <= 0) {
                 btnAgregar.innerText = "Agotado";
-                btnAgregar.className = "w-full bg-gray-400 text-white py-3 rounded-lg font-bold cursor-not-allowed";
+                btnAgregar.className = "w-full bg-gray-700 text-gray-400 py-3 rounded-lg font-bold cursor-not-allowed";
                 btnAgregar.disabled = true;
             } else {
                 btnAgregar.innerText = "Agregar al Carrito";
-                btnAgregar.className = "w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition";
+                btnAgregar.className = "w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-500 transition shadow-lg";
                 btnAgregar.disabled = false;
                 btnAgregar.onclick = function() {
                     agregarAlCarrito(id);
@@ -424,7 +438,7 @@
             const keys = Object.keys(productos);
 
             if (keys.length === 0) {
-                grid.innerHTML = `<p class="text-gray-500 col-span-2">No hay productos registrados en el catálogo.</p>`;
+                grid.innerHTML = `<p class="text-gray-400 col-span-2">No hay productos registrados en el catálogo.</p>`;
                 return;
             }
 
@@ -432,16 +446,16 @@
                 const p = productos[id];
                 const sinStock = p.stock <= 0;
                 return `
-                    <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col justify-between cursor-pointer hover:shadow-lg transition">
-                        <img src="${p.imagen}" alt="${p.nombre}" onclick="abrirModal('${id}')" class="w-full h-36 object-cover bg-gray-200">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden flex flex-col justify-between cursor-pointer hover:border-emerald-500 transition">
+                        <img src="${p.imagen}" alt="${p.nombre}" onclick="abrirModal('${id}')" class="w-full h-36 object-cover bg-gray-900">
                         <div class="p-4 flex flex-col justify-between flex-grow">
                             <div onclick="abrirModal('${id}')">
-                                <h3 class="font-bold text-lg text-gray-800 hover:text-blue-600 transition">${p.nombre}</h3>
-                                <p class="text-blue-600 font-semibold mb-1">$${p.precio.toFixed(2)}</p>
-                                <p class="text-xs text-gray-500 mb-3">Stock disponible: <span class="font-bold text-gray-700">${p.stock}</span></p>
+                                <h3 class="font-bold text-lg text-white hover:text-emerald-400 transition">${p.nombre}</h3>
+                                <p class="text-emerald-400 font-semibold mb-1">$${p.precio.toFixed(2)}</p>
+                                <p class="text-xs text-gray-400 mb-3">Stock disponible: <span class="font-bold text-gray-200">${p.stock}</span></p>
                             </div>
                             <button onclick="agregarAlCarrito('${id}')" 
-                                class="w-full py-2 rounded font-semibold text-white transition ${sinStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}"
+                                class="w-full py-2 rounded-lg font-semibold text-white transition shadow ${sinStock ? 'bg-gray-700 text-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500'}"
                                 ${sinStock ? 'disabled' : ''}>
                                 ${sinStock ? 'Agotado' : 'Agregar al Carrito'}
                             </button>
@@ -464,19 +478,19 @@
             contenedor.innerHTML = keys.map(id => {
                 const p = productos[id];
                 return `
-                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded text-sm border">
+                    <div class="flex justify-between items-center bg-gray-900 p-2.5 rounded-xl text-sm border border-gray-700">
                         <div class="flex items-center gap-2">
-                            <img src="${p.imagen}" class="w-10 h-10 object-cover rounded">
+                            <img src="${p.imagen}" class="w-10 h-10 object-cover rounded-lg border border-gray-700">
                             <div>
-                                <span class="font-bold text-gray-800">${p.nombre}</span><br>
-                                <span class="text-gray-500 text-xs">$${p.precio} | Stock: <strong class="text-blue-600">${p.stock}</strong></span>
+                                <span class="font-bold text-white">${p.nombre}</span><br>
+                                <span class="text-gray-400 text-xs">$${p.precio} | Stock: <strong class="text-emerald-400">${p.stock}</strong></span>
                             </div>
                         </div>
                         <div class="flex items-center gap-1">
-                            <button onclick="cambiarImagen('${id}')" class="bg-blue-500 text-white font-bold px-2 py-1 rounded text-xs hover:bg-blue-600" title="Subir o Cambiar Foto">📷 Foto</button>
-                            <button onclick="cambiarStock('${id}', -1)" class="bg-yellow-500 text-white font-bold px-2 py-1 rounded text-xs hover:bg-yellow-600" title="Restar Stock">-</button>
-                            <button onclick="cambiarStock('${id}', 1)" class="bg-green-500 text-white font-bold px-2 py-1 rounded text-xs hover:bg-green-600" title="Sumar Stock">+</button>
-                            <button onclick="eliminarProducto('${id}')" class="bg-red-100 text-red-600 font-bold px-2 py-1 rounded text-xs hover:bg-red-200 ml-1" title="Eliminar">🗑️</button>
+                            <button onclick="cambiarImagen('${id}')" class="bg-blue-600 text-white font-bold px-2 py-1 rounded text-xs hover:bg-blue-500 shadow" title="Cambiar Foto">📷 Foto</button>
+                            <button onclick="cambiarStock('${id}', -1)" class="bg-yellow-600 text-white font-bold px-2.5 py-1 rounded text-xs hover:bg-yellow-500 shadow" title="Restar Stock">-</button>
+                            <button onclick="cambiarStock('${id}', 1)" class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded text-xs hover:bg-emerald-500 shadow" title="Sumar Stock">+</button>
+                            <button onclick="eliminarProducto('${id}')" class="bg-red-900 text-red-200 font-bold px-2 py-1 rounded text-xs hover:bg-red-800 ml-1 shadow" title="Eliminar">🗑️</button>
                         </div>
                     </div>
                 `;
@@ -489,7 +503,7 @@
             let total = 0;
 
             if (keys.length === 0) {
-                contenedor.innerHTML = `<p class="text-gray-500 text-sm py-2">El carrito está vacío</p>`;
+                contenedor.innerHTML = `<p class="text-gray-400 text-sm py-2">El carrito está vacío</p>`;
                 document.getElementById('carrito-total').innerText = '$0.00';
                 return;
             }
@@ -501,12 +515,12 @@
                 return `
                     <div class="py-2 flex justify-between items-center text-sm">
                         <div>
-                            <p class="font-semibold text-gray-800">${item.nombre}</p>
-                            <p class="text-gray-500">$${item.precio} x ${item.cantidad}</p>
+                            <p class="font-semibold text-white">${item.nombre}</p>
+                            <p class="text-gray-400 text-xs">$${item.precio} x ${item.cantidad}</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-gray-700">$${subtotal.toFixed(2)}</span>
-                            <button onclick="quitarDelCarrito('${id}')" class="text-red-500 font-bold px-2 py-1 bg-red-50 rounded hover:bg-red-100">-</button>
+                            <span class="font-bold text-emerald-400">$${subtotal.toFixed(2)}</span>
+                            <button onclick="quitarDelCarrito('${id}')" class="text-red-400 font-bold px-2 py-1 bg-red-950 border border-red-900 rounded hover:bg-red-900">-</button>
                         </div>
                     </div>
                 `;
@@ -596,7 +610,7 @@
         function mostrarAlerta(texto, tipo) {
             const alerta = document.getElementById('status-message');
             alerta.innerText = texto;
-            alerta.className = `mb-4 p-3 rounded text-sm font-semibold ${tipo === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+            alerta.className = `mb-4 p-3 rounded-xl text-sm font-semibold shadow ${tipo === 'error' ? 'bg-red-950 text-red-300 border border-red-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}`;
             alerta.classList.remove('hidden');
             setTimeout(() => alerta.classList.add('hidden'), 4000);
         }
