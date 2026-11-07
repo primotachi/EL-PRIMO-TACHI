@@ -279,7 +279,6 @@
             if (viewAdmin && !viewAdmin.classList.contains('hidden')) {
                 renderAdminLista();
             }
-            // Si el modal de admin de fotos está abierto, actualizarlo también
             if (idProductoEditandoFotos && productos[idProductoEditandoFotos]) {
                 abrirAdminFotos(idProductoEditandoFotos, true);
             }
@@ -463,7 +462,6 @@
             }
         }
 
-        // Abrir Modal para gestionar fotos de un producto específico
         window.abrirAdminFotos = function(id, silencioso = false) {
             idProductoEditandoFotos = id;
             const prod = productos[id];
@@ -489,7 +487,6 @@
             document.getElementById('modal-admin-fotos').classList.add('hidden');
         }
 
-        // Eliminar una foto en específico de la galería del producto
         window.eliminarImagenEspecifica = async function(id, indexFoto) {
             const prod = productos[id];
             if (!prod) return;
@@ -516,7 +513,6 @@
             }
         }
 
-        // Subir más fotos a un producto ya existente
         window.subirMasFotosAProducto = async function() {
             if (!idProductoEditandoFotos) return;
             const prod = productos[idProductoEditandoFotos];
@@ -839,7 +835,7 @@
                 document.getElementById('seccion-transferencia').classList.add('hidden');
                 document.getElementById('cliente-pago').value = 'Efectivo';
 
-                window.open(`https://wa.me/529625999518?text=${mensaje}`, '_blank');
+                window.open(`https://wa.me/529232340407?text=${mensaje}`, '_blank');
                 mostrarAlerta("¡Pedido enviado a WhatsApp y stock actualizado en la nube!", "success");
 
             } catch (err) {
