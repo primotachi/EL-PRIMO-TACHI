@@ -1,165 +1,529 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Primo Tachi - Catálogo Online</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <style>
+        /* Modo Claro por defecto (Tonos pasteles solicitados) */
+        :root {
+            --bg-general: #d8f3dc;
+            --bg-header: #f3c4fb;
+            --text-principal: #3c096c;
+            --card-bg: #ffffff;
+            --text-card: #1f2937;
+            --border-color: rgba(199, 125, 255, 0.4);
+        }
+
+        /* Modo Oscuro adaptado */
+        .dark {
+            --bg-general: #121214;
+            --bg-header: #1f1b24;
+            --text-principal: #e0aaff;
+            --card-bg: #1a1721;
+            --text-card: #f3f4f6;
+            --border-color: rgba(199, 125, 255, 0.2);
+        }
+
         body {
-            background-color: #212529;
-            background-image: 
-                radial-gradient(ellipse at center, rgba(52, 58, 64, 0.8) 0%, rgba(33, 37, 41, 1) 100%),
-                linear-gradient(45deg, #2b3035 25%, transparent 25%), 
-                linear-gradient(-45deg, #2b3035 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #2b3035 75%), 
-                linear-gradient(-45deg, transparent 75%, #2b3035 75%);
-            background-size: 100% 100%, 32px 32px, 32px 32px, 32px 32px, 32px 32px;
-            background-position: 0 0, 0 0, 0 16px, 16px -16px, -16px 0px;
+            background-color: var(--bg-general);
+            color: var(--text-card);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dynamic-header {
+            background-color: var(--bg-header);
+            border-color: var(--border-color);
+        }
+
+        .dynamic-card {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-card);
         }
     </style>
 </head>
-<body class="min-h-screen text-gray-100">
+<body class="min-h-screen">
 
     <div class="max-w-6xl mx-auto p-4">
-        <!-- Encabezado Cliente (Sin Botón Admin) -->
-        <header class="bg-gray-800 border border-gray-700 shadow-xl rounded-xl p-4 mb-6 flex justify-between items-center">
-            <h1 class="text-2xl font-extrabold text-emerald-400 tracking-wide">🦝 Primo Tachi - Catálogo Online</h1>
-            <span class="text-xs text-emerald-400 bg-emerald-950 px-3 py-1.5 rounded-lg border border-emerald-800 font-bold">● Tienda Oficial</span>
+        <!-- Encabezado con Acceso Oculto en el Mapache (4 Clics) y Botón de Modo Oscuro -->
+        <header class="dynamic-header shadow-xl rounded-xl p-4 mb-6 flex flex-wrap justify-between items-center gap-3 border">
+            <h1 class="text-2xl font-extrabold tracking-wide select-none" style="color: var(--text-principal);">
+                <span id="trigger-admin" onclick="manejarClicksAdmin()" class="cursor-pointer hover:scale-110 inline-block transition transform" title="Catálogo Online">🦝</span> Primo Tachi - Catálogo Online
+            </h1>
+            <div class="flex gap-2 flex-wrap items-center">
+                <!-- Botón de Modo Oscuro / Claro -->
+                <button onclick="toggleModoOscuro()" id="btn-modo-oscuro" class="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg font-semibold transition shadow text-xs flex items-center gap-1 border border-gray-300 dark:border-gray-700">
+                    🌙 <span id="texto-modo">Oscuro</span>
+                </button>
+                <button onclick="cambiarVista('catalogo')" id="btn-catalogo" class="bg-[#588157] text-white px-4 py-2 rounded-lg font-semibold transition shadow hover:bg-[#3a5a40]">Catálogo</button>
+                <button onclick="cambiarVista('faq')" id="btn-faq" class="bg-[#f72585]/10 border border-[#f72585]/30 px-4 py-2 rounded-lg font-semibold transition hover:bg-[#f72585]/20 shadow" style="color: var(--text-principal);">❓ Ayuda / FAQ</button>
+            </div>
         </header>
 
         <!-- Anuncio y Horarios Dinámicos -->
-        <div id="banner-anuncio" class="bg-gray-800 border-l-4 border-emerald-500 p-4 rounded-xl shadow-lg mb-6 hidden">
-            <h3 class="font-bold text-emerald-400 text-sm">📢 Anuncio Importante:</h3>
-            <p id="texto-anuncio" class="text-xs text-gray-300 mt-1"></p>
+        <div id="banner-anuncio" class="dynamic-header border-l-4 border-[#588157] p-4 rounded-xl shadow-lg mb-6 hidden border">
+            <h3 class="font-bold text-sm" style="color: var(--text-principal);">📢 Anuncio Importante:</h3>
+            <p id="texto-anuncio" class="text-xs mt-1 opacity-90"></p>
         </div>
-        <div class="bg-gray-800 border border-gray-700 p-3 rounded-xl shadow mb-6 text-xs text-gray-300 flex justify-between items-center">
-            <span>🕒 <strong class="text-white">Horario de Atención:</strong> <span id="span-horario" class="text-emerald-400">Cargando horario...</span></span>
+        <div class="dynamic-header border p-3 rounded-xl shadow mb-6 text-xs flex justify-between items-center">
+            <span>🕒 <strong style="color: var(--text-principal);">Horario General:</strong> <span id="span-horario" class="text-[#3a5a40] dark:text-emerald-400 font-bold">Cargando horario...</span></span>
             <span id="estado-tienda" class="font-bold px-2 py-1 rounded border">Verificando...</span>
         </div>
 
         <div id="status-message" class="hidden mb-4 p-3 rounded-xl text-sm font-semibold shadow"></div>
 
-        <!-- Vista: Catálogo y Carrito -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- VISTA: Catálogo y Carrito -->
+        <div id="view-catalogo" class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="md:col-span-2">
-                <h2 class="text-xl font-semibold mb-4 text-emerald-400 border-b border-gray-700 pb-2">Productos Disponibles</h2>
+                <h2 class="text-xl font-semibold mb-4 border-b border-[#588157]/40 pb-2" style="color: var(--text-principal);">Productos Disponibles</h2>
                 <div id="productos-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <p class="text-gray-400">Cargando productos en tiempo real...</p>
+                    <p class="opacity-70">Cargando productos en tiempo real...</p>
                 </div>
             </div>
 
             <!-- Carrito de Compras -->
-            <div class="bg-gray-800 border border-gray-700 p-5 rounded-xl shadow-xl h-fit space-y-4">
-                <h2 class="text-xl font-semibold text-emerald-400 border-b border-gray-700 pb-2">Tu Carrito</h2>
-                <div id="carrito-items" class="divide-y divide-gray-700 max-h-48 overflow-y-auto pr-1">
-                    <p class="text-gray-400 text-sm py-2">El carrito está vacío</p>
-                </div>
-                <div class="border-t border-gray-700 pt-3 flex justify-between font-bold text-lg text-white">
-                    <span>Total:</span>
-                    <span id="carrito-total" class="text-emerald-400">$0.00</span>
+            <div class="dynamic-header border p-5 rounded-xl shadow-xl h-fit space-y-4">
+                <h2 class="text-xl font-semibold border-b border-current/20 pb-2" style="color: var(--text-principal);">Tu Carrito</h2>
+                <div id="carrito-items" class="divide-y divide-current/20 max-h-48 overflow-y-auto pr-1">
+                    <p class="opacity-70 text-sm py-2">El carrito está vacío</p>
                 </div>
 
-                <div class="border-t border-gray-700 pt-3 space-y-3">
-                    <h3 class="font-bold text-sm text-emerald-300">Datos para la Entrega</h3>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-300">Nombre Completo</label>
-                        <input type="text" id="cliente-nombre" placeholder="Ej. Juan Pérez" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
+                <!-- Resumen de Costos -->
+                <div class="border-t border-current/20 pt-3 space-y-1 text-sm">
+                    <div class="flex justify-between opacity-90">
+                        <span>Subtotal:</span>
+                        <span id="carrito-subtotal">$0.00</span>
                     </div>
+                    <div id="fila-costo-envio" class="flex justify-between opacity-90 hidden">
+                        <span>Costo de Envío:</span>
+                        <span id="carrito-envio-monto" class="text-[#3a5a40] dark:text-emerald-400 font-bold">$0.00</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg pt-2 border-t border-current/20">
+                        <span>Total a Pagar:</span>
+                        <span id="carrito-total" style="color: var(--text-principal);">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-current/20 pt-3 space-y-3">
+                    <h3 class="font-bold text-sm" style="color: var(--text-principal);">Datos para la Entrega</h3>
                     <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-xs font-medium text-gray-300">Ubicación de Entrega</label>
-                            <a href="https://maps.google.com" target="_blank" class="text-xs text-emerald-400 font-semibold hover:underline">🗺️ Abrir Google Maps</a>
+                        <label class="block text-xs font-medium opacity-90">Nombre Completo</label>
+                        <input type="text" id="cliente-nombre" placeholder="Ej. Juan Pérez" class="w-full mt-1 p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                    </div>
+
+                    <!-- Tipo de Entrega -->
+                    <div>
+                        <label class="block text-xs font-medium opacity-90">Tipo de Entrega / Recolección</label>
+                        <select id="cliente-tipo-entrega" onchange="cambiarTipoEntrega()" class="w-full mt-1 p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                            <option value="Domicilio">Entrega a Domicilio</option>
+                            <option value="Recoleccion">Recoger en Punto de Venta</option>
+                        </select>
+                    </div>
+
+                    <!-- Domicilio con Zonas / Colonias Dinámicas -->
+                    <div id="contenedor-domicilio" class="space-y-2">
+                        <div>
+                            <label class="block text-xs font-medium opacity-90">Selecciona tu Colonia / Zona de Envío</label>
+                            <select id="cliente-zona-envio" onchange="renderCarrito()" class="w-full mt-1 p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                                <!-- Dinámico -->
+                            </select>
                         </div>
-                        <input type="text" id="cliente-ubicacion" placeholder="Pega aquí el enlace de Google Maps" class="w-full p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-medium opacity-90">Ubicación / Referencia o Google Maps</label>
+                                <a href="https://maps.google.com" target="_blank" class="text-xs font-bold hover:underline" style="color: var(--text-principal);">🗺️ Abrir Maps</a>
+                            </div>
+                            <input type="text" id="cliente-ubicacion" placeholder="Calle, número, referencias o enlace de Maps" class="w-full p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                        </div>
+                    </div>
+
+                    <!-- Recolección -->
+                    <div id="contenedor-recoleccion" class="hidden space-y-2">
+                        <label class="block text-xs font-medium opacity-90">Selecciona el Punto de Venta</label>
+                        <select id="cliente-punto-recoleccion" onchange="actualizarFotoPuntoCliente()" class="w-full p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                            <!-- Dinámico -->
+                        </select>
+                        <div id="cliente-punto-foto-container" class="hidden bg-white dark:bg-gray-950 p-2 rounded-lg border text-center">
+                            <p class="text-[10px] font-bold mb-1" style="color: var(--text-principal);">📸 Foto de Referencia del Punto (clic para ampliar):</p>
+                            <img id="cliente-punto-img" src="" alt="Referencia del punto" class="w-full h-32 object-cover rounded border cursor-pointer" onclick="verImagenGrande(this.src)">
+                        </div>
                     </div>
                     
                     <div class="grid grid-cols-1 gap-2">
                         <div>
-                            <label class="block text-xs font-medium text-gray-300">Método de Pago</label>
-                            <select id="cliente-pago" onchange="verificarMetodoPago()" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
+                            <label class="block text-xs font-medium opacity-90">Método de Pago</label>
+                            <select id="cliente-pago" onchange="verificarMetodoPago()" class="w-full mt-1 p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
                                 <option value="Efectivo">Efectivo</option>
                                 <option value="Transferencia">Transferencia</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-300">Hora de Entrega</label>
-                            <select id="cliente-hora" onchange="verificarHoraSeleccionada()" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
-                                <option value="Lo antes posible (Inmediato)">Lo antes posible (Inmediato)</option>
-                                <option value="En 30 minutos">En 30 minutos</option>
-                                <option value="En 1 hora">En 1 hora</option>
-                                <option value="Hoy por la tarde (4:00 PM - 6:00 PM)">Hoy por la tarde (4:00 PM - 6:00 PM)</option>
-                                <option value="Hoy por la noche (7:00 PM - 9:00 PM)">Hoy por la noche (7:00 PM - 9:00 PM)</option>
-                                <option value="especificar">Otra hora específica...</option>
+                            <label class="block text-xs font-medium opacity-90">Hora de Entrega / Recolección</label>
+                            <select id="cliente-hora" class="w-full mt-1 p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                                <!-- Dinámico -->
                             </select>
                         </div>
-                        <div id="contenedor-otra-hora" class="hidden">
-                            <input type="text" id="cliente-otra-hora-input" placeholder="Escribe la hora exacta (Ej. 5:30 PM)" class="w-full mt-1 p-2 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white outline-none focus:border-emerald-500">
-                        </div>
                     </div>
 
-                    <div id="seccion-transferencia" class="hidden bg-gray-900 p-3 rounded-lg border border-emerald-700 space-y-2">
-                        <p class="text-sm font-bold text-emerald-400">💳 DATOS PARA TRANSFERENCIA:</p>
-                        <p class="text-xs text-gray-300">CLABE: <span class="font-mono font-bold text-sm text-emerald-300">722969015347445761</span></p>
-                        <p class="text-xs font-bold text-amber-400 mt-1">⚠️ IMPORTANTE: AL FINALIZAR EL PEDIDO SE ABRIRÁ WHATSAPP Y DEBERÁS MANDAR FOTO DE TU COMPROBANTE DE PAGO.</p>
+                    <div id="seccion-transferencia" class="hidden bg-white dark:bg-gray-900 p-3 rounded-lg border border-[#588157] space-y-2 shadow-sm text-gray-900 dark:text-white">
+                        <p class="text-sm font-bold" style="color: var(--text-principal);">💳 DATOS PARA TRANSFERENCIA:</p>
+                        <p class="text-xs">CLABE: <span class="font-mono font-bold text-sm" style="color: var(--text-principal);">722969015347445761</span></p>
+                        <p class="text-xs font-bold text-red-600 dark:text-red-400 mt-1">⚠️ IMPORTANTE: AL FINALIZAR EL PEDIDO SE ABRIRÁ WHATSAPP Y DEBERÁS MANDAR FOTO DE TU COMPROBANTE DE PAGO.</p>
                     </div>
 
-                    <div class="flex items-center gap-2 pt-2 border-t border-gray-700">
-                        <input type="checkbox" id="check-acuerdo" class="w-4 h-4 text-emerald-600 rounded border-gray-700 bg-gray-900 focus:ring-emerald-500">
-                        <label for="check-acuerdo" class="text-xs text-gray-300 font-medium">Estoy de acuerdo con los datos de mi pedido y el método de pago seleccionado.</label>
+                    <div class="flex items-center gap-2 pt-2 border-t border-current/20">
+                        <input type="checkbox" id="check-acuerdo" class="w-4 h-4 text-[#588157] rounded border-gray-400 bg-white focus:ring-[#588157]">
+                        <label for="check-acuerdo" class="text-xs opacity-90 font-medium">Estoy de acuerdo con los datos de mi pedido y el método de pago seleccionado.</label>
                     </div>
                 </div>
 
-                <button onclick="finalizarPedido()" id="btn-finalizar" class="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-bold hover:bg-emerald-500 transition shadow-lg">
+                <button onclick="finalizarPedido()" id="btn-finalizar" class="w-full bg-[#588157] text-white py-2.5 rounded-lg font-bold hover:bg-[#3a5a40] transition shadow-lg">
                     Finalizar Pedido por WhatsApp
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- Modal Carrusel para Ver Producto -->
-    <div id="modal-producto" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-gray-900 border border-gray-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative">
-            <button onclick="cerrarModal()" class="absolute top-2 right-2 bg-gray-800 text-gray-300 hover:bg-gray-700 w-8 h-8 rounded-full font-bold flex items-center justify-center shadow z-20">✕</button>
-            
-            <div class="relative w-full h-64 bg-gray-950 flex items-center justify-center">
-                <img id="modal-img" src="" alt="" class="w-full h-64 object-contain">
-                <button onclick="cambiarFotoCarrusel(-1)" id="btn-prev-img" class="absolute left-2 bg-black bg-opacity-60 text-emerald-400 hover:text-white hover:bg-opacity-90 w-9 h-9 rounded-full font-bold flex items-center justify-center transition shadow-lg text-lg hidden">❮</button>
-                <button onclick="cambiarFotoCarrusel(1)" id="btn-next-img" class="absolute right-2 bg-black bg-opacity-60 text-emerald-400 hover:text-white hover:bg-opacity-90 w-9 h-9 rounded-full font-bold flex items-center justify-center transition shadow-lg text-lg hidden">❯</button>
-                <span id="modal-indicador-foto" class="absolute bottom-2 right-2 bg-black bg-opacity-70 text-emerald-300 text-xs px-2.5 py-1 rounded-md border border-gray-700 hidden"></span>
+        <!-- VISTA: Preguntas Frecuentes / FAQ -->
+        <div id="view-faq" class="dynamic-header border p-6 rounded-2xl shadow-2xl max-w-4xl mx-auto space-y-6 hidden">
+            <div class="flex justify-between items-center border-b border-current/25 pb-3">
+                <h2 class="text-xl font-semibold" style="color: var(--text-principal);">❓ Preguntas Frecuentes y Guía de Uso</h2>
+                <button onclick="cambiarVista('catalogo')" class="text-sm bg-white dark:bg-gray-800 border px-3 py-1 rounded-lg font-semibold transition hover:opacity-80" style="color: var(--text-principal);">Regresar al Catálogo 🛒</button>
             </div>
 
+            <div class="space-y-4 text-sm opacity-90">
+                <div class="dynamic-card p-4 rounded-xl border space-y-2 shadow-sm">
+                    <h3 class="font-bold text-base" style="color: var(--text-principal);">1. ¿Cómo realizo un pedido paso a paso?</h3>
+                    <p>Es muy sencillo:</p>
+                    <ul class="list-disc pl-5 space-y-1 text-xs opacity-80">
+                        <li>Explora el catálogo y da clic en cualquier producto o en su foto para ver sus imágenes en tamaño grande y detalles.</li>
+                        <li>Da clic en <strong>"Agregar al Carrito"</strong>.</li>
+                        <li>En el apartado de entrega, escribe tu nombre completo, elige si prefieres <strong>Entrega a Domicilio</strong> o <strong>Recoger en Punto de Venta</strong>.</li>
+                        <li>Selecciona tu zona o sucursal, método de pago y la hora en que deseas recibirlo.</li>
+                        <li>Marca la casilla de que estás de acuerdo y haz clic en <strong>"Finalizar Pedido por WhatsApp"</strong> para enviarnos tu orden automáticamente.</li>
+                    </ul>
+                </div>
+
+                <div class="dynamic-card p-4 rounded-xl border space-y-2 shadow-sm">
+                    <h3 class="font-bold text-base" style="color: var(--text-principal);">2. ¿Cómo puedo ver la foto o fachada del punto de recolección?</h3>
+                    <p>Cuando selecciones la opción <strong>"Recoger en Punto de Venta"</strong> en el formulario del carrito, aparecerá automáticamente una miniatura con la fotografía o mapa de referencia del local elegido. Si le das clic a esa imagen, se abrirá en tamaño grande para que puedas ubicarlo sin problemas.</p>
+                </div>
+
+                <div class="dynamic-card p-4 rounded-xl border space-y-2 shadow-sm">
+                    <h3 class="font-bold text-base" style="color: var(--text-principal);">3. ¿Qué pasa si hago una transferencia y mi pedido es rechazado o no se confirma?</h3>
+                    <p class="text-red-600 dark:text-red-400 font-semibold">⚠️ Política de reembolsos por transferencia:</p>
+                    <p>Cada pedido necesita confirmación vía WhatsApp. Si realizaste tu transferencia pero tu pedido no pudo ser confirmado o fue rechazado por falta de stock u otro motivo, puedes pedir el <strong>reintegro total de tu transferencia</strong> siempre y когда cuentes y muestres tu comprobante original de la transferencia.</p>
+                </div>
+
+                <div class="dynamic-card p-4 rounded-xl border space-y-2 shadow-sm">
+                    <h3 class="font-bold text-base" style="color: var(--text-principal);">4. ¿Cómo calculan los costos de envío a domicilio?</h3>
+                    <p>Al elegir <strong>Entrega a Domicilio</strong>, la plataforma te pedirá seleccionar tu colonia o zona de envío del menú desplegable. El costo configurado por el administrador se sumará de forma automática y transparente a tu subtotal para que sepas exactamente cuánto pagarás antes de enviar tu mensaje a WhatsApp.</p>
+                </div>
+
+                <div class="dynamic-card p-4 rounded-xl border space-y-2 shadow-sm">
+                    <h3 class="font-bold text-base" style="color: var(--text-principal);">5. ¿Qué hago si la tienda aparece como "Cerrada Temporalmente"?</h3>
+                    <p>Nuestra tienda opera dentro de un horario establecido (o puede ser cerrada manualmente por vacaciones o mantenimiento). Si visualizas el indicador como <strong>"Cerrado Temporalmente"</strong>, los botones de compra se desactivarán automáticamente para evitar pedidos fuera de nuestro horario de atención. Te sugerimos revisar el horario general indicado en la parte superior.</p>
+                </div>
+
+                <div class="dynamic-card p-4 rounded-xl border space-y-2 shadow-sm">
+                    <h3 class="font-bold text-base" style="color: var(--text-principal);">6. ¿Cómo puedo ver más de una foto de los productos?</h3>
+                    <p>Muchos productos cuentan con múltiples imágenes. Verás una etiqueta flotante con el número de fotos (por ejemplo, 📷 3 fotos). Al dar clic sobre la imagen principal del producto, se abrirá un carrusel interactivo con botones de flecha (❮ ❯) para que puedas navegar libremente por todas las imágenes disponibles.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA: Panel de Administración -->
+        <div id="view-admin" class="dynamic-header border p-6 rounded-2xl shadow-2xl max-w-2xl mx-auto space-y-6 hidden">
+            <div class="flex justify-between items-center border-b border-current/25 pb-3">
+                <h2 class="text-xl font-semibold" style="color: var(--text-principal);">Panel de Administración</h2>
+                <button onclick="cerrarAdmin()" class="text-sm bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-200 border border-red-300 dark:border-red-800 px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition">Salir de Admin 🚪</button>
+            </div>
+
+            <!-- Configuración Horarios y Anuncios -->
+            <div class="dynamic-card p-4 rounded-xl border space-y-3 shadow-sm">
+                <h3 class="font-bold text-sm" style="color: var(--text-principal);">⚙️ Control de Horarios y Anuncios</h3>
+                <div>
+                    <label class="block text-xs font-medium opacity-80">Aviso / Anuncio Importante</label>
+                    <textarea id="admin-anuncio" rows="2" placeholder="Ej. ¡Hoy tenemos servicio a domicilio gratis!" class="w-full mt-1 p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium opacity-80">Hora Apertura</label>
+                        <select id="admin-hora-apertura" class="w-full mt-1 p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                            <option value="6">06:00 AM</option><option value="7">07:00 AM</option><option value="8">08:00 AM</option>
+                            <option value="9" selected>09:00 AM</option><option value="10">10:00 AM</option><option value="11">11:00 AM</option><option value="12">12:00 PM</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium opacity-80">Hora Cierre</label>
+                        <select id="admin-hora-cierre" class="w-full mt-1 p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                            <option value="18">06:00 PM</option><option value="19">07:00 PM</option><option value="20">08:00 PM</option>
+                            <option value="21" selected>09:00 PM</option><option value="22">10:00 PM</option><option value="23">11:00 PM</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="admin-cerrado-forzado" class="w-4 h-4 text-red-600 rounded border-gray-300 dark:bg-gray-900">
+                    <label for="admin-cerrado-forzado" class="text-xs text-red-600 dark:text-red-400 font-bold">Cerrar tienda manualmente (Modo Vacaciones)</label>
+                </div>
+                <button onclick="guardarConfiguracion(event)" class="w-full bg-[#588157] text-white py-2 rounded-lg text-xs font-bold hover:bg-[#3a5a40] transition">
+                    Guardar Configuración General
+                </button>
+            </div>
+
+            <!-- Costos de Envío por Zona / Colonia -->
+            <div class="dynamic-card p-4 rounded-xl border space-y-3 shadow-sm">
+                <h3 class="font-bold text-sm" style="color: var(--text-principal);">🚚 Costos de Envío por Zona / Colonia</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input type="text" id="nueva-zona-nombre" placeholder="Colonia / Zona (Ej. Centro)" class="p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                    <input type="number" step="0.01" id="nueva-zona-precio" placeholder="Precio Envío ($)" class="p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                </div>
+                <button onclick="agregarZonaEnvio()" class="w-full bg-[#588157] text-white font-bold py-2 rounded-lg text-xs hover:bg-[#3a5a40] transition">Añadir Zona de Envío</button>
+                <div id="lista-zonas-admin" class="space-y-1.5 max-h-36 overflow-y-auto pr-1"></div>
+            </div>
+
+            <!-- Puntos de Recolección -->
+            <div class="dynamic-card p-4 rounded-xl border space-y-3 shadow-sm">
+                <h3 class="font-bold text-sm" style="color: var(--text-principal);">📍 Puntos de Venta / Sucursales</h3>
+                <div class="space-y-2">
+                    <input type="text" id="nuevo-punto-nombre" placeholder="Nombre (Ej. Sucursal Centro)" class="w-full p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                    <input type="text" id="nuevo-punto-horario" placeholder="Horario (Ej. 10:00 AM - 04:00 PM)" class="w-full p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                    <div>
+                        <label class="block text-xs font-medium opacity-80 mb-1">Foto de Referencia del Punto:</label>
+                        <input type="file" id="nuevo-punto-foto" accept="image/*" class="w-full text-xs opacity-80 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#588157] file:text-white hover:file:bg-[#3a5a40] cursor-pointer">
+                    </div>
+                </div>
+                <button onclick="agregarPuntoRecoleccion()" class="w-full bg-[#588157] text-white font-bold py-2 rounded-lg text-xs hover:bg-[#3a5a40] transition">Añadir Punto de Recolección</button>
+                <div id="lista-puntos-admin" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+            </div>
+
+            <!-- Horas de Entrega Permitidas -->
+            <div class="dynamic-card p-4 rounded-xl border space-y-3 shadow-sm">
+                <h3 class="font-bold text-sm" style="color: var(--text-principal);">⏰ Horas de Entrega Disponibles</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div>
+                        <label class="block text-[10px] opacity-80 mb-1">Hora</label>
+                        <select id="sel-hora" class="w-full p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                            <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                            <option value="9" selected>9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] opacity-80 mb-1">Minutos</label>
+                        <select id="sel-min" class="w-full p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                            <option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] opacity-80 mb-1">AM / PM</label>
+                        <select id="sel-ampm" class="w-full p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                            <option value="AM">AM</option><option value="PM" selected>PM</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="agregarHoraEntrega()" class="w-full bg-[#588157] text-white font-bold py-2 rounded-lg text-xs hover:bg-[#3a5a40] transition">Añadir</button>
+                    </div>
+                </div>
+                <div id="lista-horas-admin" class="space-y-1.5 max-h-36 overflow-y-auto pr-1 pt-1"></div>
+            </div>
+
+            <!-- Notificaciones de Pedidos Recibidos -->
+            <div class="dynamic-card p-4 rounded-xl border space-y-3 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-sm" style="color: var(--text-principal);">🔔 Pedidos Recibidos en Tiempo Real</h3>
+                    <button onclick="borrarHistorialPedidos()" class="text-[10px] bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-200 border border-red-300 dark:border-red-800 px-2 py-1 rounded hover:opacity-80 transition font-bold">Limpiar</button>
+                </div>
+                <div id="admin-pedidos-notificaciones" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <p class="text-xs opacity-60 italic">No hay pedidos recientes.</p>
+                </div>
+            </div>
+            
+            <!-- Formulario Producto -->
+            <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-3 border-t border-current/25 pt-4">
+                <h3 class="font-bold text-sm" style="color: var(--text-principal);">📦 Agregar Nuevo Producto</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium opacity-80">Nombre</label>
+                        <input type="text" id="prod-nombre" required class="w-full mt-1 p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium opacity-80">Precio ($)</label>
+                        <input type="number" step="0.01" id="prod-precio" required class="w-full mt-1 p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium opacity-80">Stock Inicial</label>
+                        <input type="number" id="prod-stock" required class="w-full mt-1 p-2 text-sm bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium opacity-80">Descripción Breve</label>
+                    <textarea id="prod-descripcion" rows="2" placeholder="Ej. Producto fresco" class="w-full mt-1 p-2 text-xs bg-white dark:bg-gray-900 border rounded-lg outline-none focus:border-[#588157] text-gray-900 dark:text-white"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium opacity-80">Imágenes del Producto</label>
+                    <input type="file" id="prod-imagenes-input" accept="image/*" multiple required class="w-full mt-1 text-xs opacity-80 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#588157] file:text-white hover:file:bg-[#3a5a40] cursor-pointer">
+                </div>
+                <button type="submit" class="w-full bg-[#588157] text-white py-2.5 rounded-lg font-bold hover:bg-[#3a5a40] transition shadow">
+                    Guardar Producto en la Nube
+                </button>
+            </form>
+
+            <div class="border-t border-current/25 pt-4">
+                <h3 class="font-bold text-sm mb-2" style="color: var(--text-principal);">Inventario Actual</h3>
+                <div id="admin-productos-lista" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div id="modal-producto" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
+        <div class="dynamic-card border rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative">
+            <button onclick="cerrarModal()" class="absolute top-2 right-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 w-8 h-8 rounded-full font-bold flex items-center justify-center shadow z-20">✕</button>
+            <div class="relative w-full h-64 bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
+                <img id="modal-img" src="" alt="" class="w-full h-64 object-contain">
+                <button onclick="cambiarFotoCarrusel(-1)" id="btn-prev-img" class="absolute left-2 bg-black bg-opacity-50 text-white hover:bg-opacity-80 w-9 h-9 rounded-full font-bold flex items-center justify-center transition shadow-lg text-lg hidden">❮</button>
+                <button onclick="cambiarFotoCarrusel(1)" id="btn-next-img" class="absolute right-2 bg-black bg-opacity-50 text-white hover:bg-opacity-80 w-9 h-9 rounded-full font-bold flex items-center justify-center transition shadow-lg text-lg hidden">❯</button>
+                <span id="modal-indicador-foto" class="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2.5 py-1 rounded-md border border-gray-700 hidden"></span>
+            </div>
             <div class="p-5 space-y-3">
-                <h3 id="modal-nombre" class="font-bold text-2xl text-white"></h3>
-                <p id="modal-precio" class="text-emerald-400 font-bold text-xl"></p>
-                <p id="modal-descripcion" class="text-sm text-gray-300 bg-gray-800 p-3 rounded-lg border border-gray-700"></p>
-                <p id="modal-stock" class="text-sm text-gray-300"></p>
-                <button id="modal-btn-agregar" onclick="" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-500 transition shadow-lg">
+                <h3 id="modal-nombre" class="font-bold text-2xl"></h3>
+                <p id="modal-precio" class="text-[#3a5a40] dark:text-emerald-400 font-bold text-xl"></p>
+                <p id="modal-descripcion" class="text-sm p-3 rounded-lg border opacity-90"></p>
+                <p id="modal-stock" class="text-sm opacity-80"></p>
+                <button id="modal-btn-agregar" onclick="" class="w-full bg-[#588157] text-white py-3 rounded-lg font-bold hover:bg-[#3a5a40] transition shadow-lg">
                     Agregar al Carrito
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Script Cliente -->
+    <div id="modal-admin-fotos" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
+        <div class="dynamic-card border rounded-xl max-w-lg w-full p-5 space-y-4 shadow-2xl relative">
+            <div class="flex justify-between items-center border-b border-current/20 pb-3">
+                <h3 class="font-bold text-lg" style="color: var(--text-principal);">🖼️ Gestionar Fotos del Producto</h3>
+                <button onclick="cerrarAdminFotos()" class="font-bold text-lg opacity-80 hover:opacity-100">✕</button>
+            </div>
+            <div id="admin-galeria-miniaturas" class="grid grid-cols-3 gap-3 max-h-56 overflow-y-auto p-1 rounded-lg border"></div>
+            <div class="pt-2 border-t border-current/20">
+                <label class="block text-xs font-medium opacity-80 mb-1">Añadir más fotos:</label>
+                <div class="flex gap-2">
+                    <input type="file" id="input-add-mas-fotos" accept="image/*" multiple class="w-full text-xs opacity-80 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#588157] file:text-white hover:file:bg-[#3a5a40] cursor-pointer">
+                    <button onclick="subirMasFotosAProducto()" class="bg-[#588157] text-white font-bold px-4 py-1.5 rounded-lg text-xs hover:bg-[#3a5a40] transition shadow whitespace-nowrap">Subir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-imagen-grande" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 hidden z-50" onclick="this.classList.add('hidden')">
+        <img id="img-grande-src" src="" class="max-w-full max-h-full object-contain rounded-lg">
+    </div>
+
+    <!-- Script Principal Unificado -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, update, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, update, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = { databaseURL: "https://primo-tache-default-rtdb.firebaseio.com/" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        const PASSWORD_ADMIN = "T4ch1PCChaparrito/*#";
         let productos = {};
         let carrito = {};
+        let puntosRecoleccion = {};
+        let horasPermitidas = {};
+        let zonasEnvio = {};
         let tiendaAbierta = true;
         let imagenesActualesModal = [];
         let indiceFotoActual = 0;
+        let idProductoEditandoFotos = null;
+        let primerCargaPedidos = true;
+
+        let contadorClicksAdmin = 0;
+        let tiempoUltimoClick = 0;
+
+        // --- SISTEMA DE MODO OSCURO / CLARO ---
+        window.toggleModoOscuro = function() {
+            const htmlRoot = document.getElementById('html-root');
+            const textoModo = document.getElementById('texto-modo');
+            if (htmlRoot.classList.contains('dark')) {
+                htmlRoot.classList.remove('dark');
+                localStorage.setItem('primo_tachi_modo', 'claro');
+                textoModo.innerText = 'Oscuro';
+            } else {
+                htmlRoot.classList.add('dark');
+                localStorage.setItem('primo_tachi_modo', 'oscuro');
+                textoModo.innerText = 'Claro';
+            }
+        }
+
+        // Cargar preferencia guardada
+        if (localStorage.getItem('primo_tachi_modo') === 'oscuro') {
+            document.getElementById('html-root').classList.add('dark');
+            document.getElementById('texto-modo').innerText = 'Claro';
+        }
+
+        window.manejarClicksAdmin = function() {
+            const ahora = new Date().getTime();
+            if (ahora - tiempoUltimoClick > 1500) {
+                contadorClicksAdmin = 1;
+            } else {
+                contadorClicksAdmin++;
+            }
+            tiempoUltimoClick = ahora;
+
+            if (contadorClicksAdmin >= 4) {
+                contadorClicksAdmin = 0;
+                solicitarAccesoAdmin();
+            }
+        }
 
         onValue(ref(db, 'productos'), (snapshot) => {
             productos = snapshot.val() || {};
             renderCatalogo();
+            const viewAdmin = document.getElementById('view-admin');
+            if (viewAdmin && !viewAdmin.classList.contains('hidden')) renderAdminLista();
+            if (idProductoEditandoFotos && productos[idProductoEditandoFotos]) abrirAdminFotos(idProductoEditandoFotos, true);
+        });
+
+        onValue(ref(db, 'puntosRecoleccion'), (snapshot) => {
+            puntosRecoleccion = snapshot.val() || {};
+            renderPuntosCliente();
+            const viewAdmin = document.getElementById('view-admin');
+            if (viewAdmin && !viewAdmin.classList.contains('hidden')) renderPuntosAdmin();
+        });
+
+        onValue(ref(db, 'horasPermitidas'), (snapshot) => {
+            horasPermitidas = snapshot.val() || {};
+            renderHorasCliente();
+            const viewAdmin = document.getElementById('view-admin');
+            if (viewAdmin && !viewAdmin.classList.contains('hidden')) renderHorasAdmin();
+        });
+
+        onValue(ref(db, 'zonasEnvio'), (snapshot) => {
+            zonasEnvio = snapshot.val() || {};
+            renderZonasCliente();
+            const viewAdmin = document.getElementById('view-admin');
+            if (viewAdmin && !viewAdmin.classList.contains('hidden')) renderZonasAdmin();
+        });
+
+        onValue(ref(db, 'pedidos'), (snapshot) => {
+            const pedidos = snapshot.val() || {};
+            renderNotificacionesPedidos(pedidos);
+            if (primerCargaPedidos) {
+                primerCargaPedidos = false;
+                return;
+            }
+            const viewAdmin = document.getElementById('view-admin');
+            if (viewAdmin && !viewAdmin.classList.contains('hidden')) reproducirAlertaSonora();
         });
 
         onValue(ref(db, 'config'), (snapshot) => {
@@ -188,16 +552,27 @@
 
             if (tiendaAbierta) {
                 estadoTienda.innerText = "● Abierto en Línea";
-                estadoTienda.className = "font-bold px-2 py-1 rounded border text-emerald-400 bg-emerald-950 border-emerald-800";
-                btnFinalizar.disabled = false;
-                btnFinalizar.className = "w-full bg-emerald-600 text-white py-2.5 rounded-lg font-bold hover:bg-emerald-500 transition shadow-lg cursor-pointer";
-                btnFinalizar.innerText = "Finalizar Pedido por WhatsApp";
+                estadoTienda.className = "font-bold px-2 py-1 rounded border text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 border-emerald-300 dark:border-emerald-800";
+                if(btnFinalizar) {
+                    btnFinalizar.disabled = false;
+                    btnFinalizar.className = "w-full bg-[#588157] text-white py-2.5 rounded-lg font-bold hover:bg-[#3a5a40] transition shadow-lg cursor-pointer";
+                    btnFinalizar.innerText = "Finalizar Pedido por WhatsApp";
+                }
             } else {
                 estadoTienda.innerText = "● Cerrado Temporalmente";
-                estadoTienda.className = "font-bold px-2 py-1 rounded border text-red-400 bg-red-950 border-red-800";
-                btnFinalizar.disabled = true;
-                btnFinalizar.className = "w-full bg-gray-700 text-gray-400 py-2.5 rounded-lg font-bold cursor-not-allowed";
-                btnFinalizar.innerText = "Tienda Cerrada (Fuera de Horario)";
+                estadoTienda.className = "font-bold px-2 py-1 rounded border text-red-600 bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800";
+                if(btnFinalizar) {
+                    btnFinalizar.disabled = true;
+                    btnFinalizar.className = "w-full bg-gray-300 dark:bg-gray-800 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg font-bold cursor-not-allowed";
+                    btnFinalizar.innerText = "Tienda Cerrada (Fuera de Horario)";
+                }
+            }
+
+            if (document.getElementById('admin-anuncio')) {
+                document.getElementById('admin-anuncio').value = config.anuncio || "";
+                document.getElementById('admin-hora-apertura').value = apertura;
+                document.getElementById('admin-hora-cierre').value = cierre;
+                document.getElementById('admin-cerrado-forzado').checked = cerradoForzado;
             }
         });
 
@@ -208,24 +583,477 @@
             return horaActual >= apertura && horaActual <= cierre;
         }
 
-        window.verificarHoraSeleccionada = function() {
-            const selector = document.getElementById('cliente-hora').value;
-            const contenedorOtra = document.getElementById('contenedor-otra-hora');
-            if (selector === 'especificar') {
-                contenedorOtra.classList.remove('hidden');
-            } else {
-                contenedorOtra.classList.add('hidden');
+        window.solicitarAccesoAdmin = function() {
+            const pass = prompt("Ingresa la contraseña de administrador:");
+            if (pass === PASSWORD_ADMIN) {
+                cambiarVista('admin');
+                mostrarAlerta("Acceso concedido al panel.", "success");
+            } else if (pass !== null) {
+                alert("Contraseña incorrecta.");
             }
+        }
+
+        window.cerrarAdmin = function() { cambiarVista('catalogo'); }
+
+        window.cambiarVista = function(vista) {
+            const vCat = document.getElementById('view-catalogo');
+            const vFaq = document.getElementById('view-faq');
+            const vAdm = document.getElementById('view-admin');
+            const bCat = document.getElementById('btn-catalogo');
+            const bFaq = document.getElementById('btn-faq');
+
+            vCat.classList.add('hidden');
+            vFaq.classList.add('hidden');
+            vAdm.classList.add('hidden');
+
+            bCat.className = "bg-[#588157] text-white px-4 py-2 rounded-lg font-semibold transition shadow hover:bg-[#3a5a40]";
+            bFaq.className = "bg-[#f72585]/10 border border-[#f72585]/30 px-4 py-2 rounded-lg font-semibold transition hover:bg-[#f72585]/20 shadow";
+
+            if (vista === 'catalogo') {
+                vCat.classList.remove('hidden');
+                bCat.className = "bg-[#588157] text-white px-4 py-2 rounded-lg font-semibold transition shadow hover:bg-[#3a5a40]";
+            } else if (vista === 'faq') {
+                vFaq.classList.remove('hidden');
+                bCat.className = "bg-[#588157] text-white px-4 py-2 rounded-lg font-semibold transition shadow hover:bg-[#3a5a40]";
+            } else if (vista === 'admin') {
+                vAdm.classList.remove('hidden');
+                renderAdminLista();
+                renderPuntosAdmin();
+                renderHorasAdmin();
+                renderZonasAdmin();
+            }
+        }
+
+        window.cambiarTipoEntrega = function() {
+            const tipo = document.getElementById('cliente-tipo-entrega').value;
+            const dom = document.getElementById('contenedor-domicilio');
+            const rec = document.getElementById('contenedor-recoleccion');
+            if (tipo === 'Domicilio') {
+                dom.classList.remove('hidden');
+                rec.classList.add('hidden');
+            } else {
+                dom.classList.add('hidden');
+                rec.classList.remove('hidden');
+                actualizarFotoPuntoCliente();
+            }
+            renderCarrito();
+        }
+
+        function renderZonasCliente() {
+            const select = document.getElementById('cliente-zona-envio');
+            if(!select) return;
+            const keys = Object.keys(zonasEnvio);
+            if (keys.length === 0) {
+                select.innerHTML = `<option value="0|Envío Estándar">Envío Estándar ($0.00)</option>`;
+                renderCarrito();
+                return;
+            }
+            select.innerHTML = keys.map(id => {
+                const z = zonasEnvio[id];
+                return `<option value="${z.precio}|${z.nombre}">📍 ${z.nombre} — $${parseFloat(z.precio).toFixed(2)}</option>`;
+            }).join('');
+            renderCarrito();
+        }
+
+        window.agregarZonaEnvio = async function() {
+            const nombre = document.getElementById('nueva-zona-nombre').value.trim();
+            const precio = parseFloat(document.getElementById('nueva-zona-precio').value);
+
+            if (!nombre || isNaN(precio) || precio < 0) {
+                alert("Ingresa un nombre de zona válido y un precio correcto.");
+                return;
+            }
+
+            try {
+                await push(ref(db, 'zonasEnvio'), { nombre, precio });
+                document.getElementById('nueva-zona-nombre').value = "";
+                document.getElementById('nueva-zona-precio').value = "";
+                mostrarAlerta("¡Zona de envío añadida!", "success");
+            } catch(e) { alert("Error al guardar zona."); }
+        }
+
+        window.eliminarZonaEnvio = async function(id) {
+            if (confirm("¿Eliminar esta zona de envío?")) {
+                await remove(ref(db, `zonasEnvio/${id}`));
+                mostrarAlerta("Zona eliminada.", "success");
+            }
+        }
+
+        function renderZonasAdmin() {
+            const contenedor = document.getElementById('lista-zonas-admin');
+            if(!contenedor) return;
+            const keys = Object.keys(zonasEnvio);
+            if (keys.length === 0) {
+                contenedor.innerHTML = `<p class="text-xs opacity-60 italic">No hay zonas de envío configuradas.</p>`;
+                return;
+            }
+            contenedor.innerHTML = keys.map(id => {
+                const z = zonasEnvio[id];
+                return `
+                    <div class="flex justify-between items-center bg-gray-100 dark:bg-gray-900 px-3 py-1.5 rounded-lg border text-xs">
+                        <span>🚚 <strong>${z.nombre}</strong>: <span class="text-[#3a5a40] dark:text-emerald-400 font-bold">$${parseFloat(z.precio).toFixed(2)}</span></span>
+                        <button onclick="eliminarZonaEnvio('${id}')" class="text-red-600 font-bold px-2 py-0.5 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900 rounded">Eliminar</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPuntosCliente() {
+            const select = document.getElementById('cliente-punto-recoleccion');
+            if(!select) return;
+            const keys = Object.keys(puntosRecoleccion);
+            if (keys.length === 0) {
+                select.innerHTML = `<option value="Sin puntos registrados">No hay puntos de recolección disponibles</option>`;
+                document.getElementById('cliente-punto-foto-container').classList.add('hidden');
+                return;
+            }
+            select.innerHTML = keys.map(id => {
+                const p = puntosRecoleccion[id];
+                return `<option value="${p.nombre} (Horario: ${p.horario})" data-img="${p.imagen || ''}">📍 ${p.nombre} — 🕒 ${p.horario}</option>`;
+            }).join('');
+            actualizarFotoPuntoCliente();
+        }
+
+        window.actualizarFotoPuntoCliente = function() {
+            const select = document.getElementById('cliente-punto-recoleccion');
+            const container = document.getElementById('cliente-punto-foto-container');
+            const imgEl = document.getElementById('cliente-punto-img');
+            if(!select || !container || !imgEl) return;
+            const selectedOption = select.options[select.selectedIndex];
+            if(selectedOption && selectedOption.dataset.img) {
+                imgEl.src = selectedOption.dataset.img;
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        window.verImagenGrande = function(src) {
+            document.getElementById('img-grande-src').src = src;
+            document.getElementById('modal-imagen-grande').classList.remove('hidden');
+        }
+
+        function renderHorasCliente() {
+            const select = document.getElementById('cliente-hora');
+            if(!select) return;
+            const keys = Object.keys(horasPermitidas);
+            if (keys.length === 0) {
+                select.innerHTML = `<option value="No hay horarios configurados">No hay horas de entrega disponibles</option>`;
+                return;
+            }
+            select.innerHTML = keys.map(id => {
+                const h = horasPermitidas[id];
+                return `<option value="${h.hora}">${h.hora}</option>`;
+            }).join('');
         }
 
         window.verificarMetodoPago = function() {
             const metodo = document.getElementById('cliente-pago').value;
             const seccionTrans = document.getElementById('seccion-transferencia');
-            if (metodo === 'Transferencia') {
-                seccionTrans.classList.remove('hidden');
-            } else {
-                seccionTrans.classList.add('hidden');
+            if (metodo === 'Transferencia') seccionTrans.classList.remove('hidden');
+            else seccionTrans.classList.add('hidden');
+        }
+
+        window.guardarConfiguracion = async function(e) {
+            e.preventDefault();
+            const anuncio = document.getElementById('admin-anuncio').value;
+            const apertura = parseInt(document.getElementById('admin-hora-apertura').value);
+            const cierre = parseInt(document.getElementById('admin-hora-cierre').value);
+            const cerradoForzado = document.getElementById('admin-cerrado-forzado').checked;
+            try {
+                await set(ref(db, 'config'), { anuncio, apertura, cierre, cerradoForzado });
+                mostrarAlerta("¡Configuración guardada con éxito!", "success");
+            } catch (err) { alert("Error al guardar."); }
+        }
+
+        window.agregarPuntoRecoleccion = async function() {
+            const nombre = document.getElementById('nuevo-punto-nombre').value.trim();
+            const horario = document.getElementById('nuevo-punto-horario').value.trim();
+            const inputFoto = document.getElementById('nuevo-punto-foto');
+            if (!nombre || !horario) { alert("Completa el nombre y el horario del punto."); return; }
+            try {
+                mostrarAlerta("Guardando punto...", "success");
+                let imagenBase64 = "";
+                if (inputFoto.files && inputFoto.files[0]) {
+                    imagenBase64 = await convertirArchivoABase64(inputFoto.files[0]);
+                }
+                await push(ref(db, 'puntosRecoleccion'), { nombre, horario, imagen: imagenBase64 });
+                document.getElementById('nuevo-punto-nombre').value = "";
+                document.getElementById('nuevo-punto-horario').value = "";
+                inputFoto.value = "";
+                mostrarAlerta("¡Punto agregado con éxito!", "success");
+            } catch (e) { alert("Error al guardar punto."); }
+        }
+
+        window.modificarHorarioPunto = async function(id) {
+            const punto = puntosRecoleccion[id];
+            if(!punto) return;
+            const nuevoHorario = prompt(`Modificar horario para "${punto.nombre}":`, punto.horario);
+            if(nuevoHorario === null || !nuevoHorario.trim()) return;
+            try {
+                await update(ref(db, `puntosRecoleccion/${id}`), { horario: nuevoHorario.trim() });
+                mostrarAlerta("¡Horario actualizado!", "success");
+            } catch(e) { alert("Error al actualizar horario."); }
+        }
+
+        window.cambiarFotoPunto = async function(id) {
+            const punto = puntosRecoleccion[id];
+            if(!punto) return;
+            
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async e => {
+                const file = e.target.files[0];
+                if(file) {
+                    try {
+                        mostrarAlerta("Subiendo nueva foto...", "success");
+                        const b64 = await convertirArchivoABase64(file);
+                        await update(ref(db, `puntosRecoleccion/${id}`), { imagen: b64 });
+                        mostrarAlerta("¡Foto de punto actualizada con éxito!", "success");
+                    } catch(err) {
+                        alert("Error al subir la imagen.");
+                    }
+                }
+            };
+            input.click();
+        }
+
+        window.eliminarPuntoRecoleccion = async function(id) {
+            if (confirm("¿Eliminar este punto de recolección?")) {
+                await remove(ref(db, `puntosRecoleccion/${id}`));
+                mostrarAlerta("Punto eliminado.", "success");
             }
+        }
+
+        function renderPuntosAdmin() {
+            const contenedor = document.getElementById('lista-puntos-admin');
+            if(!contenedor) return;
+            const keys = Object.keys(puntosRecoleccion);
+            if (keys.length === 0) { contenedor.innerHTML = `<p class="text-xs opacity-60 italic">No hay puntos.</p>`; return; }
+            contenedor.innerHTML = keys.map(id => {
+                const p = puntosRecoleccion[id];
+                return `
+                    <div class="flex justify-between items-center bg-gray-100 dark:bg-gray-900 p-2 rounded-lg border text-xs gap-2">
+                        <div class="flex items-center gap-2">
+                            ${p.imagen ? `<img src="${p.imagen}" class="w-10 h-10 object-cover rounded cursor-pointer border" onclick="verImagenGrande(this.src)" title="Ver foto">` : '<div class="w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded flex items-center justify-center text-[10px] opacity-60">Sin foto</div>'}
+                            <div>
+                                <span class="font-bold">📍 ${p.nombre}</span><br>
+                                <span class="text-[#3a5a40] dark:text-emerald-400 font-semibold">🕒 ${p.horario}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1 flex-wrap justify-end">
+                            <button onclick="modificarHorarioPunto('${id}')" class="bg-[#588157] text-white font-bold px-2 py-1 rounded text-xs hover:bg-[#3a5a40]">🕒 Horario</button>
+                            <button onclick="cambiarFotoPunto('${id}')" class="bg-[#c77dff] text-[#3c096c] font-bold px-2 py-1 rounded text-xs hover:bg-[#b565d8]">🖼️ Foto</button>
+                            <button onclick="eliminarPuntoRecoleccion('${id}')" class="bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900 font-bold px-2 py-1 rounded text-xs">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.agregarHoraEntrega = async function() {
+            const hora = document.getElementById('sel-hora').value;
+            const min = document.getElementById('sel-min').value;
+            const ampm = document.getElementById('sel-ampm').value;
+            const horaCompleta = `${hora}:${min} ${ampm}`;
+            try {
+                await push(ref(db, 'horasPermitidas'), { hora: horaCompleta });
+                mostrarAlerta(`¡Hora agregada!`, "success");
+            } catch(e){ alert("Error"); }
+        }
+
+        window.eliminarHoraEntrega = async function(id) {
+            if (confirm("¿Eliminar hora?")) {
+                await remove(ref(db, `horasPermitidas/${id}`));
+                mostrarAlerta("Eliminada.", "success");
+            }
+        }
+
+        function renderHorasAdmin() {
+            const contenedor = document.getElementById('lista-horas-admin');
+            if(!contenedor) return;
+            const keys = Object.keys(horasPermitidas);
+            if (keys.length === 0) { contenedor.innerHTML = `<p class="text-xs opacity-60 italic">No hay horas.</p>`; return; }
+            contenedor.innerHTML = keys.map(id => {
+                const h = horasPermitidas[id];
+                return `
+                    <div class="flex justify-between items-center bg-gray-100 dark:bg-gray-900 px-3 py-1.5 rounded-lg border text-xs">
+                        <span class="font-bold">⏰ ${h.hora}</span>
+                        <button onclick="eliminarHoraEntrega('${id}')" class="text-red-600 font-bold px-2 py-0.5 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900 rounded">Eliminar</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function convertirArchivoABase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        window.guardarProducto = async function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('prod-nombre').value;
+            const precio = parseFloat(document.getElementById('prod-precio').value);
+            const stock = parseInt(document.getElementById('prod-stock').value);
+            const descripcion = document.getElementById('prod-descripcion').value.trim() || "Sin descripción.";
+            const inputArchivos = document.getElementById('prod-imagenes-input');
+            if (!inputArchivos.files || inputArchivos.files.length === 0) { alert("Selecciona imagen."); return; }
+            try {
+                let listaImágenes = [];
+                for (let i = 0; i < inputArchivos.files.length; i++) {
+                    listaImágenes.push(await convertirArchivoABase64(inputArchivos.files[i]));
+                }
+                await set(push(ref(db, 'productos')), { nombre, precio, stock, descripcion, imagen: listaImágenes[0], imagenes: listaImágenes });
+                document.getElementById('form-producto').reset();
+                mostrarAlerta("¡Producto guardado!", "success");
+            } catch (err) { alert("Error."); }
+        }
+
+        window.cambiarStock = async function(id, cambio) {
+            const prod = productos[id];
+            if (!prod) return;
+            const nuevoStock = prod.stock + cambio;
+            if (nuevoStock < 0) return;
+            await update(ref(db, `productos/${id}`), { stock: nuevoStock });
+        }
+
+        window.modificarPrecio = async function(id) {
+            const prod = productos[id];
+            if (!prod) return;
+            const nuevo = prompt(`Nuevo precio para "${prod.nombre}":`, prod.precio);
+            if (nuevo === null) return;
+            const precioVal = parseFloat(nuevo);
+            if (isNaN(precioVal) || precioVal < 0) return;
+            await update(ref(db, `productos/${id}`), { precio: precioVal });
+            mostrarAlerta("¡Precio actualizado!", "success");
+        }
+
+        window.eliminarProducto = async function(id) {
+            if (confirm("¿Eliminar producto?")) {
+                await remove(ref(db, `productos/${id}`));
+                mostrarAlerta("Eliminado.", "success");
+            }
+        }
+
+        window.abrirAdminFotos = function(id, silencioso = false) {
+            idProductoEditandoFotos = id;
+            const prod = productos[id];
+            if (!prod) return;
+            const galeria = prod.imagenes || [prod.imagen];
+            const contenedor = document.getElementById('admin-galeria-miniaturas');
+            contenedor.innerHTML = galeria.map((imgSrc, index) => `
+                <div class="relative bg-gray-100 dark:bg-gray-900 p-1.5 rounded-lg border flex flex-col items-center">
+                    <img src="${imgSrc}" class="w-full h-20 object-cover rounded mb-1">
+                    <button onclick="eliminarImagenEspecifica('${id}', ${index})" class="w-full bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900 text-[10px] font-bold py-1 rounded">Eliminar</button>
+                </div>
+            `).join('');
+            if (!silencioso) document.getElementById('modal-admin-fotos').classList.remove('hidden');
+        }
+
+        window.cerrarAdminFotos = function() { idProductoEditandoFotos = null; document.getElementById('modal-admin-fotos').classList.add('hidden'); }
+
+        window.eliminarImagenEspecifica = async function(id, indexFoto) {
+            const prod = productos[id];
+            let galeria = [...prod.imagenes];
+            if (galeria.length <= 1) { alert("Debe quedar al menos una foto."); return; }
+            if (confirm("¿Eliminar foto?")) {
+                galeria.splice(indexFoto, 1);
+                await update(ref(db, `productos/${id}`), { imagen: galeria[0], imagenes: galeria });
+                mostrarAlerta("Foto eliminada.", "success");
+            }
+        }
+
+        window.subirMasFotosAProducto = async function() {
+            if (!idProductoEditandoFotos) return;
+            const prod = productos[idProductoEditandoFotos];
+            const inputFiles = document.getElementById('input-add-mas-fotos');
+            if (!inputFiles.files || inputFiles.files.length === 0) return;
+            let nuevasFotos = prod.imagenes ? [...prod.imagenes] : [prod.imagen];
+            for (let i = 0; i < inputFiles.files.length; i++) {
+                nuevasFotos.push(await convertirArchivoABase64(inputFiles.files[i]));
+            }
+            await update(ref(db, `productos/${idProductoEditandoFotos}`), { imagen: nuevasFotos[0], imagenes: nuevasFotos });
+            inputFiles.value = "";
+            mostrarAlerta("¡Nuevas fotos añadidas!", "success");
+        }
+
+        function renderAdminLista() {
+            const contenedor = document.getElementById('admin-productos-lista');
+            if(!contenedor) return;
+            const keys = Object.keys(productos);
+            if (keys.length === 0) { contenedor.innerHTML = `<p class="text-sm opacity-60">No hay productos.</p>`; return; }
+            contenedor.innerHTML = keys.map(id => {
+                const p = productos[id];
+                const img = p.imagen || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80";
+                return `
+                    <div class="flex justify-between items-center bg-gray-100 dark:bg-gray-900 p-2.5 rounded-xl text-sm border">
+                        <div class="flex items-center gap-2">
+                            <img src="${img}" class="w-10 h-10 object-cover rounded-lg cursor-pointer border" onclick="verImagenGrande(this.src)">
+                            <div>
+                                <span class="font-bold">${p.nombre}</span><br>
+                                <span class="opacity-80 text-xs">$${p.precio.toFixed(2)} | Stock: <strong class="text-[#3a5a40] dark:text-emerald-400">${p.stock}</strong></span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="modificarPrecio('${id}')" class="bg-[#588157] text-white font-bold px-2 py-1 rounded text-xs">💲</button>
+                            <button onclick="abrirAdminFotos('${id}')" class="bg-[#c77dff] text-[#3c096c] font-bold px-2 py-1 rounded text-xs">Fotos</button>
+                            <button onclick="cambiarStock('${id}', -1)" class="bg-[#3a5a40] text-white font-bold px-2 py-1 rounded text-xs">-</button>
+                            <button onclick="cambiarStock('${id}', 1)" class="bg-[#588157] text-white font-bold px-2.5 py-1 rounded text-xs">+</button>
+                            <button onclick="eliminarProducto('${id}')" class="bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900 font-bold px-2 py-1 rounded text-xs ml-1">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderNotificacionesPedidos(pedidosObj) {
+            const contenedor = document.getElementById('admin-pedidos-notificaciones');
+            if(!contenedor) return;
+            const keys = Object.keys(pedidosObj).reverse();
+            if (keys.length === 0) { contenedor.innerHTML = `<p class="text-xs opacity-60 italic">No hay pedidos recientes.</p>`; return; }
+            contenedor.innerHTML = keys.map(id => {
+                const ped = pedidosObj[id];
+                return `
+                    <div class="bg-gray-100 dark:bg-gray-900 border p-3 rounded-xl text-xs space-y-1">
+                        <div class="flex justify-between font-bold" style="color: var(--text-principal);">
+                            <span>👤 ${ped.nombre}</span>
+                            <span class="opacity-60">${ped.fecha || ''}</span>
+                        </div>
+                        <p class="opacity-90">📦 <strong>Modalidad:</strong> ${ped.tipoEntrega || 'Domicilio'}</p>
+                        <p class="opacity-90">📍 <strong>Destino:</strong> ${ped.ubicacion}</p>
+                        <p class="opacity-90">💳 <strong>Pago:</strong> ${ped.metodoPago} | ⏰ <strong>Hora:</strong> ${ped.horaEntrega}</p>
+                        <p class="text-[#3a5a40] dark:text-emerald-400 font-bold">💰 Total: $${parseFloat(ped.totalGeneral).toFixed(2)}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.borrarHistorialPedidos = async function() {
+            if (confirm("¿Limpiar historial?")) {
+                await set(ref(db, 'pedidos'), null);
+                mostrarAlerta("Historial limpiado.", "success");
+            }
+        }
+
+        function reproducirAlertaSonora() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 587.33;
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) {}
+            mostrarAlerta("🔔 ¡Nuevo pedido recibido!", "success");
         }
 
         window.abrirModal = function(id) {
@@ -237,22 +1065,19 @@
 
             document.getElementById('modal-nombre').innerText = prod.nombre;
             document.getElementById('modal-precio').innerText = `$${prod.precio.toFixed(2)}`;
-            document.getElementById('modal-descripcion').innerText = prod.descripcion || "Sin descripción disponible.";
-            document.getElementById('modal-stock').innerHTML = `Stock disponible: <strong class="text-white">${prod.stock}</strong>`;
+            document.getElementById('modal-descripcion').innerText = prod.descripcion || "Sin descripción.";
+            document.getElementById('modal-stock').innerHTML = `Stock disponible: <strong class="font-bold">${prod.stock}</strong>`;
             
             const btnAgregar = document.getElementById('modal-btn-agregar');
             if (prod.stock <= 0 || !tiendaAbierta) {
                 btnAgregar.innerText = !tiendaAbierta ? "Tienda Cerrada" : "Agotado";
-                btnAgregar.className = "w-full bg-gray-700 text-gray-400 py-3 rounded-lg font-bold cursor-not-allowed";
+                btnAgregar.className = "w-full bg-gray-300 dark:bg-gray-800 text-gray-500 dark:text-gray-400 py-3 rounded-lg font-bold cursor-not-allowed";
                 btnAgregar.disabled = true;
             } else {
                 btnAgregar.innerText = "Agregar al Carrito";
-                btnAgregar.className = "w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-500 transition shadow-lg";
+                btnAgregar.className = "w-full bg-[#588157] text-white py-3 rounded-lg font-bold hover:bg-[#3a5a40] transition shadow-lg";
                 btnAgregar.disabled = false;
-                btnAgregar.onclick = function() {
-                    agregarAlCarrito(id);
-                    cerrarModal();
-                };
+                btnAgregar.onclick = function() { agregarAlCarrito(id); cerrarModal(); };
             }
             document.getElementById('modal-producto').classList.remove('hidden');
         }
@@ -260,11 +1085,8 @@
         window.cambiarFotoCarrusel = function(direccion) {
             if (imagenesActualesModal.length <= 1) return;
             indiceFotoActual += direccion;
-            if (indiceFotoActual < 0) {
-                indiceFotoActual = imagenesActualesModal.length - 1;
-            } else if (indiceFotoActual >= imagenesActualesModal.length) {
-                indiceFotoActual = 0;
-            }
+            if (indiceFotoActual < 0) indiceFotoActual = imagenesActualesModal.length - 1;
+            else if (indiceFotoActual >= imagenesActualesModal.length) indiceFotoActual = 0;
             actualizarVistaCarrusel();
         }
 
@@ -273,40 +1095,24 @@
             const btnPrev = document.getElementById('btn-prev-img');
             const btnNext = document.getElementById('btn-next-img');
             const indicador = document.getElementById('modal-indicador-foto');
-
             if (imagenesActualesModal.length > 0) imgElement.src = imagenesActualesModal[indiceFotoActual];
             if (imagenesActualesModal.length > 1) {
-                btnPrev.classList.remove('hidden');
-                btnNext.classList.remove('hidden');
-                indicador.classList.remove('hidden');
+                btnPrev.classList.remove('hidden'); btnNext.classList.remove('hidden'); indicador.classList.remove('hidden');
                 indicador.innerText = `Foto ${indiceFotoActual + 1} de ${imagenesActualesModal.length}`;
             } else {
-                btnPrev.classList.add('hidden');
-                btnNext.classList.add('hidden');
-                indicador.classList.add('hidden');
+                btnPrev.classList.add('hidden'); btnNext.classList.add('hidden'); indicador.classList.add('hidden');
             }
         }
 
-        window.cerrarModal = function() {
-            document.getElementById('modal-producto').classList.add('hidden');
-        }
+        window.cerrarModal = function() { document.getElementById('modal-producto').classList.add('hidden'); }
 
         window.agregarAlCarrito = function(id) {
-            if (!tiendaAbierta) {
-                alert("Lo sentimos, la tienda se encuentra cerrada en este momento.");
-                return;
-            }
+            if (!tiendaAbierta) { alert("Tienda cerrada."); return; }
             const prod = productos[id];
             const cantidadEnCarrito = carrito[id] ? carrito[id].cantidad : 0;
-            if (prod.stock <= cantidadEnCarrito) {
-                alert("No hay suficiente stock disponible.");
-                return;
-            }
-            if (!carrito[id]) {
-                carrito[id] = { nombre: prod.nombre, precio: prod.precio, cantidad: 1 };
-            } else {
-                carrito[id].cantidad++;
-            }
+            if (prod.stock <= cantidadEnCarrito) { alert("No hay suficiente stock."); return; }
+            if (!carrito[id]) carrito[id] = { nombre: prod.nombre, precio: prod.precio, cantidad: 1 };
+            else carrito[id].cantidad++;
             renderCarrito();
         }
 
@@ -320,31 +1126,28 @@
 
         function renderCatalogo() {
             const grid = document.getElementById('productos-grid');
+            if(!grid) return;
             const keys = Object.keys(productos);
-            if (keys.length === 0) {
-                grid.innerHTML = `<p class="text-gray-400 col-span-2">No hay productos registrados en el catálogo.</p>`;
-                return;
-            }
+            if (keys.length === 0) { grid.innerHTML = `<p class="opacity-70 col-span-2">No hay productos.</p>`; return; }
             grid.innerHTML = keys.map(id => {
                 const p = productos[id];
                 const sinStock = p.stock <= 0;
                 const descCorta = p.descripcion ? (p.descripcion.length > 50 ? p.descripcion.substring(0, 50) + '...' : p.descripcion) : '';
                 const imgPrincipal = p.imagen || (p.imagenes ? p.imagenes[0] : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80");
                 const totalFotos = p.imagenes ? p.imagenes.length : 1;
-
                 return `
-                    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden flex flex-col justify-between cursor-pointer hover:border-emerald-500 transition relative">
-                        ${totalFotos > 1 ? `<span class="absolute top-2 right-2 bg-black bg-opacity-75 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-gray-700 z-10 shadow">📷 ${totalFotos} fotos</span>` : ''}
-                        <img src="${imgPrincipal}" alt="${p.nombre}" onclick="abrirModal('${id}')" class="w-full h-36 object-cover bg-gray-900">
+                    <div class="dynamic-card border rounded-xl shadow-lg overflow-hidden flex flex-col justify-between cursor-pointer hover:border-[#588157] transition relative">
+                        ${totalFotos > 1 ? `<span class="absolute top-2 right-2 bg-black bg-opacity-80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10 border border-current/20">📷 ${totalFotos} fotos</span>` : ''}
+                        <img src="${imgPrincipal}" alt="${p.nombre}" onclick="abrirModal('${id}')" class="w-full h-36 object-cover bg-gray-100 dark:bg-gray-950">
                         <div class="p-4 flex flex-col justify-between flex-grow">
                             <div onclick="abrirModal('${id}')">
-                                <h3 class="font-bold text-lg text-white hover:text-emerald-400 transition">${p.nombre}</h3>
-                                <p class="text-emerald-400 font-semibold mb-1">$${p.precio.toFixed(2)}</p>
-                                <p class="text-xs text-gray-400 mb-2 line-clamp-2">${descCorta}</p>
-                                <p class="text-xs text-gray-400 mb-3">Stock: <span class="font-bold text-gray-200">${p.stock}</span></p>
+                                <h3 class="font-bold text-lg hover:opacity-80">${p.nombre}</h3>
+                                <p class="text-[#3a5a40] dark:text-emerald-400 font-semibold mb-1">$${p.precio.toFixed(2)}</p>
+                                <p class="text-xs opacity-75 mb-2 line-clamp-2">${descCorta}</p>
+                                <p class="text-xs opacity-60 mb-3">Stock: <span class="font-bold opacity-90">${p.stock}</span></p>
                             </div>
                             <button onclick="agregarAlCarrito('${id}')" 
-                                class="w-full py-2 rounded-lg font-semibold text-white transition shadow ${sinStock || !tiendaAbierta ? 'bg-gray-700 text-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500'}"
+                                class="w-full py-2 rounded-lg font-semibold transition ${sinStock || !tiendaAbierta ? 'bg-gray-300 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed' : 'bg-[#588157] text-white hover:bg-[#3a5a40]'}"
                                 ${sinStock || !tiendaAbierta ? 'disabled' : ''}>
                                 ${!tiendaAbierta ? 'Cerrado' : (sinStock ? 'Agotado' : 'Agregar al Carrito')}
                             </button>
@@ -356,82 +1159,115 @@
 
         function renderCarrito() {
             const contenedor = document.getElementById('carrito-items');
+            if(!contenedor) return;
             const keys = Object.keys(carrito);
-            let total = 0;
+            let subtotal = 0;
+
             if (keys.length === 0) {
-                contenedor.innerHTML = `<p class="text-gray-400 text-sm py-2">El carrito está vacío</p>`;
+                contenedor.innerHTML = `<p class="opacity-70 text-sm py-2">El carrito está vacío</p>`;
+                document.getElementById('carrito-subtotal').innerText = '$0.00';
+                document.getElementById('carrito-envio-monto').innerText = '$0.00';
+                document.getElementById('fila-costo-envio').classList.add('hidden');
                 document.getElementById('carrito-total').innerText = '$0.00';
                 return;
             }
+
             contenedor.innerHTML = keys.map(id => {
                 const item = carrito[id];
-                const subtotal = item.precio * item.cantidad;
-                total += subtotal;
+                const sub = item.precio * item.cantidad;
+                subtotal += sub;
                 return `
                     <div class="py-2 flex justify-between items-center text-sm">
                         <div>
-                            <p class="font-semibold text-white">${item.nombre}</p>
-                            <p class="text-gray-400 text-xs">$${item.precio} x ${item.cantidad}</p>
+                            <p class="font-semibold">${item.nombre}</p>
+                            <p class="opacity-70 text-xs">$${item.precio} x ${item.cantidad}</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-emerald-400">$${subtotal.toFixed(2)}</span>
-                            <button onclick="quitarDelCarrito('${id}')" class="text-red-400 font-bold px-2 py-1 bg-red-950 border border-red-900 rounded hover:bg-red-900">-</button>
+                            <span class="font-bold text-[#3a5a40] dark:text-emerald-400">$${sub.toFixed(2)}</span>
+                            <button onclick="quitarDelCarrito('${id}')" class="text-red-600 dark:text-red-400 font-bold px-2 py-1 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900 rounded">-</button>
                         </div>
                     </div>
                 `;
             }).join('');
-            document.getElementById('carrito-total').innerText = `$${total.toFixed(2)}`;
+
+            document.getElementById('carrito-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+
+            let costoEnvio = 0;
+            const tipoEntrega = document.getElementById('cliente-tipo-entrega').value;
+            const filaEnvio = document.getElementById('fila-costo-envio');
+
+            if (tipoEntrega === 'Domicilio') {
+                filaEnvio.classList.remove('hidden');
+                const selectZona = document.getElementById('cliente-zona-envio');
+                if (selectZona && selectZona.value) {
+                    const partes = selectZona.value.split('|');
+                    costoEnvio = parseFloat(partes[0]) || 0;
+                }
+                document.getElementById('carrito-envio-monto').innerText = `$${costoEnvio.toFixed(2)}`;
+            } else {
+                filaEnvio.classList.add('hidden');
+            }
+
+            const totalGeneral = subtotal + costoEnvio;
+            document.getElementById('carrito-total').innerText = `$${totalGeneral.toFixed(2)}`;
         }
 
         window.finalizarPedido = async function() {
-            if (!tiendaAbierta) {
-                alert("La tienda se encuentra cerrada en este momento.");
-                return;
-            }
+            if (!tiendaAbierta) { alert("La tienda está cerrada."); return; }
             const keys = Object.keys(carrito);
-            if (keys.length === 0) {
-                alert("El carrito está vacío.");
-                return;
-            }
+            if (keys.length === 0) { alert("El carrito está vacío."); return; }
+
             const nombre = document.getElementById('cliente-nombre').value.trim();
-            const ubicacion = document.getElementById('cliente-ubicacion').value.trim();
-            const metodoPago = document.getElementById('cliente-pago').value;
-            let horaEntrega = document.getElementById('cliente-hora').value;
-            if (horaEntrega === 'especificar') {
-                horaEntrega = document.getElementById('cliente-otra-hora-input').value.trim();
+            const tipoEntrega = document.getElementById('cliente-tipo-entrega').value;
+            
+            let ubicacionFinal = "";
+            let costoEnvioFinal = 0;
+            let nombreZonaFinal = "";
+
+            if (tipoEntrega === 'Domicilio') {
+                const selectZona = document.getElementById('cliente-zona-envio');
+                const partes = selectZona.value.split('|');
+                costoEnvioFinal = parseFloat(partes[0]) || 0;
+                nombreZonaFinal = partes[1] || "Zona Estándar";
+
+                const referencia = document.getElementById('cliente-ubicacion').value.trim();
+                ubicacionFinal = `Zona: ${nombreZonaFinal} (Envío: $${costoEnvioFinal.toFixed(2)}) — Ref/Maps: ${referencia || 'No especificada'}`;
+            } else {
+                ubicacionFinal = "Punto de recolección: " + document.getElementById('cliente-punto-recoleccion').value;
             }
+
+            const metodoPago = document.getElementById('cliente-pago').value;
+            const horaEntrega = document.getElementById('cliente-hora').value;
             const aceptoAcuerdo = document.getElementById('check-acuerdo').checked;
 
-            if (!nombre || !ubicacion || !horaEntrega) {
-                alert("Por favor completa todos los datos de entrega.");
-                return;
-            }
-            if (!aceptoAcuerdo) {
-                alert("Debes marcar la casilla de 'De acuerdo'.");
-                return;
-            }
+            if (!nombre || !horaEntrega) { alert("Completa tu nombre y hora de entrega."); return; }
+            if (!aceptoAcuerdo) { alert("Debes marcar la casilla de 'De acuerdo'."); return; }
+
+            alert("⚠️ CADA PEDIDO NECESITA CONFIRMACION VIA WHATSAPP. EN CASO DE TRANSFERIR Y QUE TU PEDIDO NO HAYA SIDO CONFIRMADO O FUE RECHAZADO, PUEDES PEDIR EL REGRESO DE TU TRANSFERENCIA SIEMPRE Y CUANDO CUENTES CON TU COMPROBANTE DE TRANSFERENCIA.");
 
             try {
                 const updates = {};
                 let itemsPedidoArray = [];
-                let totalGeneral = 0;
+                let subtotal = 0;
 
                 for (let id of keys) {
                     const stockActual = productos[id].stock;
                     const comprado = carrito[id].cantidad;
                     if (stockActual < comprado) {
-                        alert(`Lo sentimos, el producto "${productos[id].nombre}" ya no tiene stock.`);
+                        alert(`Stock insuficiente para "${productos[id].nombre}".`);
                         return;
                     }
                     updates[`productos/${id}/stock`] = stockActual - comprado;
                     const sub = carrito[id].precio * comprado;
-                    totalGeneral += sub;
+                    subtotal += sub;
                     itemsPedidoArray.push(`${comprado}x ${carrito[id].nombre} ($${sub.toFixed(2)})`);
                 }
 
+                const totalGeneral = subtotal + costoEnvioFinal;
+
                 const nuevoPedidoRef = push(ref(db, 'pedidos'));
                 await set(nuevoPedidoRef, {
-                    nombre, ubicacion, metodoPago, horaEntrega, totalGeneral,
+                    nombre, tipoEntrega, ubicacion: ubicacionFinal, metodoPago, horaEntrega, totalGeneral,
                     items: itemsPedidoArray,
                     fecha: new Date().toLocaleTimeString() + " - " + new Date().toLocaleDateString()
                 });
@@ -440,18 +1276,20 @@
 
                 let mensaje = `*¡NUEVO PEDIDO RECIBIDO!*%0A%0A`;
                 mensaje += `👤 *Cliente:* ${nombre}%0A`;
-                mensaje += `📍 *Ubicación:* ${ubicacion}%0A`;
+                mensaje += `📦 *Modalidad:* ${tipoEntrega === 'Domicilio' ? 'Entrega a Domicilio' : 'Recoger en Sucursal'}%0A`;
+                mensaje += `📍 *Destino:* ${ubicacionFinal}%0A`;
                 mensaje += `💳 *Pago:* ${metodoPago}%0A`;
-                mensaje += `⏰ *Entrega:* ${horaEntrega}%0A`;
+                mensaje += `⏰ *Hora:* ${horaEntrega}%0A`;
                 if (metodoPago === 'Transferencia') mensaje += `📎 *Comprobante:* [El cliente enviará foto]%0A`;
                 mensaje += `%0A🛒 *Productos:*%0A`;
                 for (let itemStr of itemsPedidoArray) mensaje += `• ${itemStr}%0A`;
-                mensaje += `%0A💰 *Total:* $${totalGeneral.toFixed(2)}*`;
+                if (tipoEntrega === 'Domicilio') mensaje += `🚚 *Costo de Envío:* $${costoEnvioFinal.toFixed(2)}%0A`;
+                mensaje += `%0A💰 *Total a Pagar:* $${totalGeneral.toFixed(2)}*`;
 
                 carrito = {};
                 renderCarrito();
                 document.getElementById('cliente-nombre').value = '';
-                document.getElementById('cliente-ubicacion').value = '';
+                if(document.getElementById('cliente-ubicacion')) document.getElementById('cliente-ubicacion').value = '';
                 document.getElementById('check-acuerdo').checked = false;
 
                 window.open(`https://wa.me/529232340407?text=${mensaje}`, '_blank');
@@ -464,8 +1302,9 @@
 
         function mostrarAlerta(texto, tipo) {
             const alerta = document.getElementById('status-message');
+            if(!alerta) return;
             alerta.innerText = texto;
-            alerta.className = `mb-4 p-3 rounded-xl text-sm font-semibold shadow ${tipo === 'error' ? 'bg-red-950 text-red-300 border border-red-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}`;
+            alerta.className = `mb-4 p-3 rounded-xl text-sm font-semibold shadow ${tipo === 'error' ? 'bg-red-100 text-red-800 border border-red-300' : 'dynamic-header border'}`;
             alerta.classList.remove('hidden');
             setTimeout(() => alerta.classList.add('hidden'), 4000);
         }
